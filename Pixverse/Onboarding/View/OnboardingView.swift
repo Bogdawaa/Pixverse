@@ -102,7 +102,7 @@ struct OnboardingView: View {
     // MARK: - OnboardingItem Data
     private let pages: [OnboardingItem] = [
         OnboardingItem(
-            imageName: "onb1",
+            imageName: "subject3fever",
             title: "Generate magic with AI",
             description: "Generate unique photos and videos in amy style - no skills needed, just imagination."
         ),
