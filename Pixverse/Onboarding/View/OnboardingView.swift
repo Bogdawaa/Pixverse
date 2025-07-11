@@ -19,17 +19,26 @@ struct OnboardingView: View {
     }
     
     var body: some View {
+        Group {
+            if viewModel.flowComplete {
+                MainView()
+            } else {
+                onboardingContent
+            }
+        }
+    }
+    
+    private var onboardingContent: some View {
         ZStack {
             Color.appBackground.ignoresSafeArea()
             
-                if viewModel.showNotificationsRequestScreen {
-                    // Allow notififcations screen
-                    notificationRequestView
-
-                } else {
-                    // Sliding tab views
-                    onboardingPagesView
-                }
+            if viewModel.showNotificationsRequestScreen {
+                // Allow notififcations screen
+                notificationRequestView
+            } else {
+                // Sliding tab views
+                onboardingPagesView
+            }
         }
         .toolbar(.hidden, for: .navigationBar)
         .alert(isPresented: $viewModel.showNotificationPermission) {
@@ -41,12 +50,17 @@ struct OnboardingView: View {
                         _ = await viewModel.requestNotificationPermission()
                         viewModel.completeOnboarding()
                     }
+                    
                 }),
                 secondaryButton: .cancel(Text("Cancel"), action: {
                     viewModel.completeOnboarding()
-                    dismiss()
                 })
             )
+        }
+        .fullScreenCover(isPresented: $viewModel.showPaywall) {
+            PaywallView(onDismiss: {
+                viewModel.flowComplete = true
+            })
         }
     }
     

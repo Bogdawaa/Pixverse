@@ -26,6 +26,8 @@ final class OnboardingViewModel {
     @Published var currentPage = 0
     @Published var showNotificationsRequestScreen = false
     @Published var showNotificationPermission = false
+    @Published var showPaywall = false
+    @Published var flowComplete = false
     
     // MARK: - Initialize
     init(
@@ -81,5 +83,10 @@ extension OnboardingViewModel: OnboardingViewModelProtocol {
     
     func completeOnboarding() {
         onboardingStorage.markOnboardingComplete()
+        showPaywall = true
+    }
+    
+    func completePaywall() {
+        flowComplete = true
     }
 }

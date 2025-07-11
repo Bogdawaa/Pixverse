@@ -32,4 +32,9 @@ final class OnboardingStorageService: OnboardingStorageServiceProtocol {
         hasCompletedOnboarding = true
         storage.save(true, forKey: key)
     }
+    
+    func markOnboardingUncomplete() {
+        hasCompletedOnboarding = false
+        storage.remove(forKey: key)
+    }
 }
