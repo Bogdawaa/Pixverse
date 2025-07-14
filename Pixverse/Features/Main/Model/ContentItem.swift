@@ -8,7 +8,20 @@
 import Foundation
 
 struct ContentItem: Identifiable {
-    let id = UUID()
+    let id: String
     var title: String
     var imageName: String
+    let category: String?
+    
+    init(
+        id: String = UUID().uuidString,
+        title: String,
+        imageName: String,
+        category: String? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.imageName = imageName
+        self.category = category
+    }
 }

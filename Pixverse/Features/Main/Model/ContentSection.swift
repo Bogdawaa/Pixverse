@@ -16,6 +16,7 @@ enum ContentSectionType: String, CaseIterable {
 struct ContentSection: Identifiable {
     let id = UUID()
     let type: ContentSectionType
-    var items: [ContentItem]
+    var items: [TemplateItem]
     var showAllButton: Bool = true
 }
+

@@ -9,11 +9,11 @@ import SwiftUI
 
 struct ContentItemView: View {
     
-    let item: ContentItem
+    let item: TemplateItem
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            Image(item.imageName)
+            Image(.onb2)
                 .resizable()
                 .scaledToFill()
                 .overlay(alignment: .bottom) {
@@ -29,7 +29,7 @@ struct ContentItemView: View {
                     )
                 }
             
-            Text(item.title)
+            Text(item.name)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.white)
                 .font(.system(size: 14))
@@ -43,5 +43,16 @@ struct ContentItemView: View {
 }
 
 #Preview {
-    ContentItemView(item: ContentItem(title: "Some massive text for test", imageName: "funtasticMermaid"))
+    ContentItemView(
+        item: TemplateItem(from: TemplateDTO(
+            prompt: "",
+            name: "Name",
+            category: "Category",
+            isActive: false,
+            previewSmall: "",
+            previewLarge: "",
+            id: 1,
+            templateId: 1
+        ))
+    )
 }

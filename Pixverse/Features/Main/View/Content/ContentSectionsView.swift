@@ -12,13 +12,49 @@ struct ContentSectionsView: View {
     @ObservedObject var viewModel: ContentSectionViewModel
     
     var body: some View {
-        ScrollView(.vertical) {
-            VStack(spacing: 24) {
-                ForEach(viewModel.sections) { section in
-                    ContentSectionView(viewModel: viewModel, section: section)
+        ZStack {
+            if !viewModel.sections.isEmpty {
+                ScrollView(.vertical) {
+                    VStack(spacing: 24) {
+                        ForEach(viewModel.sections) { section in
+                            ContentSectionView(viewModel: viewModel, section: section)
+                        }   
+                    }
+                    .padding(.vertical, 16)
                 }
             }
-            .padding(.vertical, 16)
+            
+            // if loading
+            // TODO: Change ProgressView style
+            if viewModel.isLoading && viewModel.sections.isEmpty {
+                ProgressView()
+                    .padding(20)
+                    .background(.regularMaterial) // System material effect
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
+            }
+            
+            // if empty
+            if viewModel.sections.isEmpty && !viewModel.isLoading {
+                EmptyView(retryAction: {
+                    Task { await viewModel.fetchTemplates() }
+                })
+            }
+            
+            // if error
+            if let error = viewModel.error {
+                ErrorView(
+                    error: error,
+                    dismissAction: {
+                        viewModel.error = nil
+                    },
+                    retryAction: {
+                        Task { await viewModel.fetchTemplates() }
+                    }
+                )
+                .zIndex(1)
+                .transition(.opacity)
+            }
         }
     }
 }
