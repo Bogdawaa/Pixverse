@@ -147,21 +147,6 @@ struct PaywallView: View {
     }
 }
 
-// MARK: - SafariView Extension
-extension View {
-    func safariSheet(url: Binding<AppURL?>) -> some View {
-        self.sheet(item: url) { urlCase in
-            if UIApplication.shared.canOpenURL(urlCase.url) {
-                SFSafariViewWrapper(url: urlCase.url)
-                    .ignoresSafeArea()
-            } else {
-                Text("Invalid URL")
-                    .foregroundColor(.blue)
-            }
-        }
-    }
-}
-
 #Preview {
     PaywallView(onDismiss: {})
 }

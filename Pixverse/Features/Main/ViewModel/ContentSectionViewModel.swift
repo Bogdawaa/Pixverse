@@ -15,13 +15,12 @@ protocol ContentSectionViewModelProtocol: ObservableObject {
 }
 
 final class ContentSectionViewModel: ContentSectionViewModelProtocol {
-    
     @Published private(set) var sections: [ContentSection] = []
-    @Published var isLoading = false
-    
+    @Published private(set) var isLoading = false
+    @Published var selectedSectionForAllItems: ContentSectionType? = nil
+    @Published var error: Error?
     @Published var templates: [TemplateItem] = []
     @Published var styles: [StyleItem] = []
-    @Published var error: Error?
     
     private let templateService: TemplateServiceProtocol
     
@@ -45,14 +44,7 @@ final class ContentSectionViewModel: ContentSectionViewModelProtocol {
         
         do {
             let response = try await templateService.fetchTemplates(appID: "com.test.test")
-            templates = response.templates?.map(TemplateItem.init) ?? []
-            
-            if !templates.isEmpty {
-                sections.removeAll { $0.type == .videoTemplates }
-                sections.insert(ContentSection(
-                    type: .videoTemplates,
-                    items: templates), at: 0)
-            }
+            try processResponse(response)
             
             self.isLoading = false
         } catch {
@@ -63,6 +55,72 @@ final class ContentSectionViewModel: ContentSectionViewModelProtocol {
     }
     
     func didTapShowAll(for section: ContentSectionType) {
-        print("Show all tapped for \(section.rawValue)")
+        print("Show all tapped for \(section.title)")
+        selectedSectionForAllItems = section
+    }
+    
+    // MARK: - Private Methods
+    @MainActor
+    private func processResponse(_ response: TemplateResponseDTO) throws {
+        let templates = response.templates?.map(TemplateItem.init) ?? []
+        let styles = response.styles?.map(StyleItem.init) ?? []
+        
+        let trendingTemplates = templates.filter { $0.category?.lowercased() == "trending" }
+        
+        sections = createHomeSections(from: trendingTemplates, styles: styles)
+        isLoading = false
+    }
+    
+    // MARK: - Private Methods
+    private func createSections(from templates: [TemplateItem], styles: [StyleItem]) -> [ContentSection] {
+        var sections = [ContentSection]()
+        
+        // sections grouped by categories
+        let groupedTemplates = Dictionary(grouping: templates, by: { $0.category ?? "Other" })
+        sections += groupedTemplates.map { category, items in
+            ContentSection(
+                type: .custom(title: category),
+                items: items,
+                showAllButton: true
+            )
+        }
+        
+        // Style section
+        if !styles.isEmpty {
+            sections.append(
+                ContentSection(
+                    type: .videoStyles,
+                    items: styles,
+                    showAllButton: true)
+            )
+        }
+        
+        return sections.sorted { $0.type.title < $1.type.title }
+    }
+    
+    
+    private func createHomeSections(from templates: [TemplateItem], styles: [StyleItem]) -> [ContentSection] {
+        var sections = [ContentSection]()
+        
+        // Trending templates section
+        if !templates.isEmpty {
+            sections.append(
+                ContentSection(
+                    type: .videoTemplates,
+                    items: templates,
+                    showAllButton: true)
+            )
+        }
+        
+        // Popular styles section
+        if !styles.isEmpty {
+            sections.append(
+                ContentSection(
+                    type: .videoStyles,
+                    items: styles,
+                    showAllButton: true)
+            )
+        }
+        return sections
     }
 }

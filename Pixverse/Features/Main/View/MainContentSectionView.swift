@@ -7,16 +7,20 @@
 
 import SwiftUI
 
-struct ContentSectionView: View {
+struct MainContentSectionView: View {
+    
+    @EnvironmentObject private var homeCoordinator: HomeCoordinator
+    @EnvironmentObject private var appCoordinator: AppCoordinator
+    @EnvironmentObject private var videoCoordinator: VideoCoordinator
+
     
     @ObservedObject var viewModel: ContentSectionViewModel
-    
     let section: ContentSection
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(section.type.rawValue)
+                Text(section.type.title)
                     .font(.headline)
                     .foregroundStyle(.white)
                 
@@ -24,7 +28,9 @@ struct ContentSectionView: View {
                 
                 if section.showAllButton {
                     Button(action: {
-                        viewModel.didTapShowAll(for: section.type)
+                        appCoordinator.selectedTab = 1
+//                        appCoordinator.selectedVideoTab = .templates
+                        videoCoordinator.showAllItems(for: section)
                     }) {
                         HStack(spacing: 4) {
                             Text("All")
@@ -40,7 +46,7 @@ struct ContentSectionView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(section.items) { item in
+                    ForEach(section.items, id: \.id) { item in
                         ContentItemView(item: item)
                     }
                 }

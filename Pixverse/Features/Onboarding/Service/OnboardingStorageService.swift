@@ -24,13 +24,13 @@ final class OnboardingStorageService: OnboardingStorageServiceProtocol {
     // MARK: - Initialize
     init(storage: StorageProtocol = UserDefaultsStorage()) {
         self.storage = storage
-        self.hasCompletedOnboarding = storage.load(forKey: key) ?? false
+        self.hasCompletedOnboarding = (try? storage.load(forKey: key)) ?? false
     }
     
     // MARK: - Public Methods
     func markOnboardingComplete() {
         hasCompletedOnboarding = true
-        storage.save(true, forKey: key)
+        try? storage.save(true, forKey: key)
     }
     
     func markOnboardingUncomplete() {

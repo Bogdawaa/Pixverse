@@ -20,7 +20,7 @@ final class OnboardingViewModel {
     
     // MARK: - Properties
     private let notificationCenter: UNUserNotificationCenter
-    private var onboardingStorage: OnboardingStorageServiceProtocol
+    private var onboardingStorage: any OnboardingStorageServiceProtocol
     
     // MARK: - Published
     @Published var currentPage = 0
@@ -31,7 +31,7 @@ final class OnboardingViewModel {
     
     // MARK: - Initialize
     init(
-        onboardingStorgage: OnboardingStorageServiceProtocol = OnboardingStorageService(),
+        onboardingStorgage: any OnboardingStorageServiceProtocol = OnboardingStorageService(),
         notificationCenter: UNUserNotificationCenter = .current()
     ) {
         self.onboardingStorage = onboardingStorgage

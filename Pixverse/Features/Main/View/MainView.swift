@@ -10,35 +10,21 @@ import SwiftUI
 struct MainView: View {
     @EnvironmentObject var storage: OnboardingStorageService
     
+    @StateObject private var appCoordinator = AppCoordinator()
+    @StateObject private var homeCoordinator = HomeCoordinator()
+    @StateObject private var videoCoordinator = VideoCoordinator()
+    
     var body: some View {
-        NavigationStack {
+        VStack(spacing: 0) {
             MainViewWrapper()
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    // Title
-                    ToolbarItem(placement: .principal) {
-                        HStack {
-                            Text("Pixverse Video")
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundColor(.white)
-                            Spacer()
-                        }
-                    }
-                    // Setting button
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            //
-                        }) {
-                            Image(.setting)
-                                .font(.system(size: 20))
-                                .foregroundColor(.white)
-                        }
-                    }
-                }
+                .environmentObject(appCoordinator)
+                .environmentObject(homeCoordinator)
+                .environmentObject(videoCoordinator)
         }
-            
+        .background(.appBackground)
     }
 }
 #Preview {
     MainView()
+        .environmentObject(OnboardingStorageService())
 }

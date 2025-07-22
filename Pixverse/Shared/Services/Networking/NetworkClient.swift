@@ -31,6 +31,8 @@ final class DefaultNetworkClientImpl: NetworkClient {
             throw NetworkError.invalidURL
         }
         
+        print("🌐 Request URL: \(url.absoluteString)")
+        
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = request.method.rawValue
         urlRequest.allHTTPHeaderFields = request.headers
@@ -41,7 +43,9 @@ final class DefaultNetworkClientImpl: NetworkClient {
                 components?.queryItems = parameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
                 urlRequest.url = components?.url
             } else {
-                urlRequest.httpBody = try JSONSerialization.data(withJSONObject: parameters)
+                let boundary = "Boundary-\(UUID().uuidString)"
+                urlRequest.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+                urlRequest.httpBody = createMultipartBody(parameters: parameters, boundary: boundary)
             }
         }
         
@@ -56,6 +60,8 @@ final class DefaultNetworkClientImpl: NetworkClient {
                 if httpResponse.statusCode == 401 {
                     throw NetworkError.unauthorized
                 } else {
+                    let responseBody = String(data: data, encoding: .utf8) ?? "No body"
+                    print("⚠️ Server error: \(httpResponse.statusCode), Body: \(responseBody)")
                     throw NetworkError.serverError(code: httpResponse.statusCode)
                 }
             }
@@ -69,5 +75,49 @@ final class DefaultNetworkClientImpl: NetworkClient {
             throw NetworkError.requestFailed(description: error.localizedDescription)
         }
         
+    }
+}
+
+extension DefaultNetworkClientImpl {
+    private func createMultipartBody(parameters: [String: Any], boundary: String) -> Data {
+        var body = Data()
+        
+        for (key, value) in parameters {
+            if let fileData = value as? MultipartFile {
+                body.append("--\(boundary)\r\n".data(using: .utf8)!)
+                body.append("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(fileData.fileName)\"\r\n".data(using: .utf8)!)
+                body.append("Content-Type: \(fileData.mimeType)\r\n\r\n".data(using: .utf8)!)
+                body.append(fileData.data)
+                body.append("\r\n".data(using: .utf8)!)
+            } else {
+                // Handle regular parameters
+                body.append("--\(boundary)\r\n".data(using: .utf8)!)
+                body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                body.append("\(value)\r\n".data(using: .utf8)!)
+            }
+        }
+        
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        return body
+    }
+}
+
+struct MultipartFile {
+    let data: Data
+    let fileName: String
+    let mimeType: String
+    
+    init(data: Data, fileName: String, mimeType: String) {
+        self.data = data
+        self.fileName = fileName
+        self.mimeType = mimeType
+    }
+    
+    static func image(data: Data, fileName: String = "image.jpg") -> MultipartFile {
+        return MultipartFile(data: data, fileName: fileName, mimeType: "image/jpeg")
+    }
+    
+    static func video(data: Data, fileName: String = "video.mp4") -> MultipartFile {
+        return MultipartFile(data: data, fileName: fileName, mimeType: "video/mp4")
     }
 }

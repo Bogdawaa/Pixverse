@@ -11,4 +11,7 @@ protocol StorageProtocol {
     func save(_ value: Any, forKey key: String)
     func load<T>(forKey key: String) -> T?
     func remove(forKey key: String)
+    
+    func save<T: Codable>(_ value: T, forKey key: String) throws
+    func load<T: Codable>(forKey key: String) throws -> T?
 }

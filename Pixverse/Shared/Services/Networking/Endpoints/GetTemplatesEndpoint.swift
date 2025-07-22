@@ -7,11 +7,11 @@
 
 import Foundation
 
-enum TemplatesEndpoint {
+enum GetTemplatesEndpoint {
     case getTemplates(appID: String)
 }
 
-extension TemplatesEndpoint: NetworkRequest {
+extension GetTemplatesEndpoint: NetworkRequest {
     
     typealias Response = TemplateResponseDTO
     

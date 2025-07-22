@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TemplateItem: Identifiable {
+struct TemplateItem: Identifiable, ContentItemProtocol {
     let id: Int
     let templateId: Int?
     let name: String
@@ -29,7 +29,7 @@ struct TemplateItem: Identifiable {
     }
 }
 
-struct StyleItem: Identifiable {
+struct StyleItem: Identifiable, ContentItemProtocol {
     let id: Int
     let templateId: Int?
     let name: String

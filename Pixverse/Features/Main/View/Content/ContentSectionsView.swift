@@ -13,11 +13,15 @@ struct ContentSectionsView: View {
     
     var body: some View {
         ZStack {
+            
+            Color.appBackground
+                .edgesIgnoringSafeArea(.all)
+            
             if !viewModel.sections.isEmpty {
                 ScrollView(.vertical) {
-                    VStack(spacing: 24) {
+                    LazyVStack(spacing: 24) {
                         ForEach(viewModel.sections) { section in
-                            ContentSectionView(viewModel: viewModel, section: section)
+                            MainContentSectionView(viewModel: viewModel, section: section)
                         }   
                     }
                     .padding(.vertical, 16)
@@ -29,7 +33,7 @@ struct ContentSectionsView: View {
             if viewModel.isLoading && viewModel.sections.isEmpty {
                 ProgressView()
                     .padding(20)
-                    .background(.regularMaterial) // System material effect
+                    .background(.regularMaterial)
                     .cornerRadius(10)
                     .shadow(radius: 5)
             }
@@ -56,5 +60,6 @@ struct ContentSectionsView: View {
                 .transition(.opacity)
             }
         }
+        .background(.appBackground)
     }
 }
