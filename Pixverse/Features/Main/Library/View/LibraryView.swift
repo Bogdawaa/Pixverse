@@ -9,6 +9,9 @@ import SwiftUI
 
 struct LibraryView: View {
     
+    
+    @EnvironmentObject var appCoordinator: AppCoordinator
+    
     @StateObject private var viewModel: LibraryViewModel = LibraryViewModel()
     
     private var gridLayout: [GridItem] {
@@ -60,26 +63,16 @@ struct LibraryView: View {
                 .foregroundStyle(.appText)
                 .multilineTextAlignment(.center)
             
-            HStack(spacing: 16) {
-                Group {
-                    Button {
-                        //
-                    } label: {
-                        Text("Video")
-                            .frame(maxWidth: .infinity)
-                            .frame(maxHeight: 50)
-                    }
-                    
-                    Button {
-                        //
-                    } label: {
-                        Text("Photo")
-                            .frame(maxWidth: .infinity)
-                            .frame(maxHeight: 50)
-                    }
-                }
-                .buttonStyle(.primaryButton)
+            Button {
+                appCoordinator.navigateToVideoTemplate()
+            } label: {
+                Text("Video")
+                    .frame(maxWidth: .infinity)
+                    .frame(maxHeight: 50)
             }
+            .buttonStyle(.primaryButton)
+            .padding(.top, 24)
+            
             Spacer()
         }
     }
@@ -114,7 +107,8 @@ struct LibraryView: View {
             )
         ) {
             if let generation = viewModel.selectedGeneration, let _ = generation.videoUrl {
-                GenerationResult(item: generation)
+                let vm = GenerationResultViewModel(item: generation)
+                GenerationResult(viewModel: vm)
             }
         }
     }

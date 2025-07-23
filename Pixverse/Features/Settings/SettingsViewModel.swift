@@ -10,6 +10,8 @@ import MessageUI
 
 final class SettingsViewModel: ObservableObject {
     
+    @EnvironmentObject var appState: AppState
+
     @Published var showNotificationPermission = false
     @Published var isToggleOn = false
     @Published private(set) var appVersion: String = "1.0.0"
@@ -50,7 +52,7 @@ final class SettingsViewModel: ObservableObject {
     func getEmailURL() -> URL? {
         let subject = "Pixverse Support"
         let body = """
-            User ID: \(Constants.userId)
+            User ID: \(appState.userId)
             
             Please describe your issue below:
             """

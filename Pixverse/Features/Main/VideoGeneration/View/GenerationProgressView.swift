@@ -40,9 +40,11 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
             
             if viewModel.isGenerationComplete {
                 VStack {
-                    generationResult
-                    Spacer()
-                    templatesFooterView
+                    ScrollView{
+                        generationResult
+                        Spacer()
+                        templatesFooterView
+                    }
                 }
                 .transition(.opacity)
                 .navigationDestination(isPresented: $showFullscreenPlayer) {
@@ -90,6 +92,8 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                 .overlay {
                     if viewModel.isLoading {
                         ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(.white)
                     }
                 }
             
@@ -159,43 +163,14 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                     Text(error.localizedDescription)
                 }
             }
-            
-            SocialMediaButtonsFooter()
+            if let videoUrl = URL(string: viewModel.generatedVideoUrl ?? "") {
+                SocialMediaButtonsFooter(shareItem: videoUrl)
+            }
         }
         .background(Color.appCard)
         .clipShape(RoundedRectangle(cornerRadius: 30))
         .padding()
     }
-    
-//    private var socialMediaButtons: some View {
-//        HStack(spacing: 12) {
-//            SocialMediaButton(
-//                icon: Image(.instagram),
-//                label: "Instagram"
-//            )
-//            
-//            SocialMediaButton(
-//                icon: Image(.facebook),
-//                label: "Facebook"
-//            )
-//            
-//            SocialMediaButton(
-//                icon: Image(.tikTok),
-//                label: "TikTok"
-//            )
-//            
-//            SocialMediaButton(
-//                icon: Image(.whatsapp),
-//                label: "WhatsApp"
-//            )
-//            
-//            SocialMediaButton(
-//                icon: Image(systemName: "ellipsis"),
-//                label: "Still"
-//            )
-//        }
-//        .padding()
-//    }
     
     // MARK: - Footer with other templates
     private var templatesFooterView: some View {

@@ -62,8 +62,16 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     @Published var showMediaPicker = false
     @Published var selectedStyleItem: (any ContentItemProtocol)? = nil
     @Published var styleItems: [StyleItem]? = nil
-    @Published var activeGenerations: [VideoGeneration] = []
     @Published var errorMessage: String?
+    @Published var showAlert: Bool = false
+    
+    @Published var activeGenerations: [VideoGeneration] = [] {
+        didSet {
+            if activeGenerations.count > maxConcurrentGenerations && oldValue.count <= maxConcurrentGenerations {
+                showAlert = true
+            }
+        }
+    }
     
     @Published var isUploadPhotoEnabled = false {
         didSet {
@@ -90,8 +98,9 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     }
     
     private let storage: VideoGenerationStorageService
-    private var templateService: TemplateServiceProtocol
-    private let statusCheckInterval: TimeInterval = 30 
+    private let templateService: TemplateServiceProtocol
+    private let statusCheckInterval: TimeInterval = 30
+    private let maxConcurrentGenerations = 2
     
     init(templateService: TemplateServiceProtocol = TemplateService(networkClient: DefaultNetworkClientImpl(baseURL: Constants.baseURL)),
          storage: VideoGenerationStorageService = VideoGenerationStorageService()
@@ -178,14 +187,23 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     }
     
     func generate(with parameters: GenerationParameters) async  {
+       loadGenerations()
+        
+        let generating = activeGenerations.filter { $0.status == .generating }.count
+        guard generating < maxConcurrentGenerations else {
+            print("ACTIVE GENERATION: \(generating)")
+            errorMessage = "Maximum number of generations is limited to \(maxConcurrentGenerations). Please wait for current generations to finish."
+            showAlert = true
+            return
+        }
+        
         switch selectedMedia {
         case .photo(let uiImage):
             if let prompt = parameters.prompt {
                 await generateImageToVideo(prompt: prompt, image: uiImage)
             }
-        case .video(let url):
-//            await generateVideoToVideo(templateId: parameters.templateId, videoURL: url)
-            return
+        case .video(let _):
+            break
         case nil:
             // TODO: add textToVideo Generation
             break
@@ -251,11 +269,13 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
                 
                 print("Generation started. Video ID: \(response.videoId)")
             } else {
+                showAlert = true
                 errorMessage = "Generation failed. Try to change image for generation"
                 print("Image-to-video generation started. Video ID: \(response.videoId)")
             }
         } catch let err {
             // Handle errors
+            showAlert = true
             errorMessage = "Generation failed. Try to change image for generation"
             error = err
             isLoading = false
@@ -266,6 +286,8 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
         Task {
             while true {
                 do {
+                    try await Task.sleep(nanoseconds: UInt64(statusCheckInterval * 1_000_000_000))
+
                     let status = try await templateService.checkVideoStatus(videoId: generation.generationId)
                     print("status \(status.status)")
                     
@@ -293,10 +315,10 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
                             return
                         }
                         
-                    case "failed":
+                    case "error":
+                        errorMessage = "Generation failed. Please try again."
                         error = NSError(domain: "Generation failed", code: -2)
                         isLoading = false
-                        print("Status Failed")
                         
                         try storage.deleteGeneration(id: generation.id)
                         await MainActor.run {
@@ -307,10 +329,10 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
                     default:
                         isLoading = true
                     }
-                    
-                    try await Task.sleep(nanoseconds: UInt64(statusCheckInterval * 1_000_000_000))
-                    
+                                        
                 } catch {
+                    errorMessage = "Generation failed. Please try again."
+                    showAlert = true
                     self.error = error
                     isLoading = false
                     break

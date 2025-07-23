@@ -22,7 +22,8 @@ struct GenerationResultFooter: View {
                 .fontWeight(.bold)
                 .font(.title2)
                 .foregroundStyle(.white)
-                .padding()
+                .padding(.horizontal)
+                .padding(.top)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 8) {
@@ -38,11 +39,11 @@ struct GenerationResultFooter: View {
                         
                     }
                 }
-                .padding()
+                .padding(.horizontal)
             }
         }
+        .toolbarBackground(Color.appBackground, for: .navigationBar)
         .background(.appCard)
-        .clipShape(RoundedRectangle(cornerRadius: 30))
         .onAppear {
             visibleItems = Array(items.prefix(5))
         }

@@ -12,6 +12,9 @@ import AVKit
 
 struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
     
+    @EnvironmentObject var appState: AppState
+    @Environment(\.dismiss) var dismiss
+
     enum MediaType: Hashable {
         case photo(UIImage)
         case video(URL)
@@ -19,6 +22,7 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
     
     @State var error: Error?
     @State var selectedMedia: MediaType?
+    @State var isShowPaywall = false
 
 
     @ObservedObject var viewModel: ViewModel
@@ -28,13 +32,13 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
     @State private var showPhotoPicker = false
     @State private var selectedImage: UIImage?
     @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var showAlert = false
     
     @State private var player: AVPlayer?
     @State private var isPlaying: Bool = false
     
     @EnvironmentObject private var appCoordinator: AppCoordinator
     @EnvironmentObject private var videoCoordinator: VideoCoordinator
-    @Environment(\.dismiss) var dismiss
     
     let item: any ContentItemProtocol
     
@@ -55,11 +59,21 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                 
                 // Generate button
                 Button(action: {
-                    checkPhotoLibraryPermission()
+                    if appState.isPremium {
+                        checkPhotoLibraryPermission()
+                    } else {
+                        isShowPaywall = true
+                    }
                 }, label: {
-                    Text("Generate")
-                        .frame(height: 50)
-                        .frame(maxWidth: .infinity)
+                    HStack {
+                        Text("Generate")
+                            .frame(height: 50)
+                        if !appState.isPremium {
+                            Image(systemName: "sparkles")
+                                .foregroundStyle(.appBackground)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
                 })
                 .buttonStyle(.primaryButton)
             }
@@ -76,6 +90,16 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                 }
             } message: {
                 Text("To upload an image, the app needs access to your photo library")
+            }
+            // Error alert
+            .alert("Error",
+                   isPresented: $showAlert) {
+                Button("OK", role: .cancel) {
+                    showAlert = false
+                    viewModel.errorMessage = nil
+                }
+            } message: {
+                Text(viewModel.errorMessage ?? "An error occurred during generation")
             }
             // Pick photo
             .photosPicker(isPresented: $showPhotoPicker,
@@ -99,14 +123,23 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                 player?.pause()
                 player = nil
             }
-//            .navigationTitle("Templates")
-//            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Templates")
                         .font(.system(size: 17, weight: .bold))
                         .foregroundColor(.white)
                 }
+                
+                if !appState.isPremium {
+                ToolbarItem(placement: .topBarTrailing) {
+                        SubscriptionButton()
+                    }
+                }
+            }
+            .fullScreenCover(isPresented: $isShowPaywall) {
+                PaywallView(onDismiss: {
+                    isShowPaywall = false
+                })
             }
             
         }
@@ -119,10 +152,15 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
             if let data = try? await selectedItem?.loadTransferable(type: Data.self),
                let image = UIImage(data: data) {
                 selectedImage = image
-                videoCoordinator.showGenerationProgress(with: image)
                 
                 if let vm = viewModel as? VideoGenerationViewModel {
                     await vm.generate(with: .init(templateId: templateId, image: image, videoUrl: nil))
+                    if vm.errorMessage == nil {
+                        videoCoordinator.showGenerationProgress(with: image)
+                    } else {
+                        showAlert = true
+                        print(viewModel.errorMessage)
+                    }
                 }
             }
         }
@@ -149,14 +187,18 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                     print("Successfully loaded video from: \(url)")
                 }
                 
-                if let thumbnail = thumbnail {
-                    videoCoordinator.showGenerationProgress(with: thumbnail)
-                } else {
-                    videoCoordinator.showGenerationProgress(with: UIImage(resource: .subject3Fever))
-                }
-                
                 if let vm = viewModel as? VideoGenerationViewModel {
                     await vm.generate(with: .init(templateId: templateId, image: nil, videoUrl: url))
+                    if vm.errorMessage == nil {
+                        if let thumbnail = thumbnail {
+                            videoCoordinator.showGenerationProgress(with: thumbnail)
+                        } else {
+                            videoCoordinator.showGenerationProgress(with: UIImage(resource: .subject3Fever))
+                        }
+                    } else {
+                        showAlert = true
+                        print(viewModel.errorMessage)
+                    }
                 }
                 
                 return

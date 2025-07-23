@@ -10,7 +10,9 @@ import SwiftUI
 struct SettingsView: View {
     
     @StateObject private var viewModel = SettingsViewModel()
+    
     @State private var showMailUnavailableAlert = false
+    @State private var isShowPaywall = false
     
     var body: some View {
         VStack {
@@ -24,13 +26,13 @@ struct SettingsView: View {
                 
                 ) {
                     // Row 1
-                    NavigationLink {
-                        Text("Subscription management")
+                    Button {
+                        isShowPaywall = true
                     } label: {
                         Text("Subscription management")
                             .padding(.leading, 16)
-                        
                     }
+
                     
                     // Row 2 (with toggle)
                     HStack {
@@ -122,6 +124,11 @@ struct SettingsView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text("Please set up an email account on your device to contact support.")
+        }
+        .fullScreenCover(isPresented: $isShowPaywall) {
+            PaywallView {
+                isShowPaywall = false
+            }
         }
     }
 

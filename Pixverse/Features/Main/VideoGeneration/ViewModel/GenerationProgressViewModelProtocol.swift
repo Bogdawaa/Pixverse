@@ -15,6 +15,8 @@ protocol GenerationProgressViewModelProtocol: ObservableObject {
     @MainActor var generatedVideoUrl: String? { get }
     @MainActor var isGenerationComplete: Bool { get }
     @MainActor var downloadState: VideoGenerationViewModel.DownloadState { get set }
+    @MainActor var showAlert: Bool { get set }
+    @MainActor var errorMessage: String? { get set }
     
     func generate(with parameters: GenerationParameters) async
     func downloadVideo() async

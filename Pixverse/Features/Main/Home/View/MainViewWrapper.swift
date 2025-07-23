@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainViewWrapper: View {
-    @State var hasSubscription = false // TODO: refactor
+    @EnvironmentObject var appState: AppState
     
     @EnvironmentObject private var appCoordinator: AppCoordinator
     @EnvironmentObject private var homeCoordinator: HomeCoordinator
@@ -64,9 +64,9 @@ struct MainViewWrapper: View {
                                                 
                                         }
                                         // Subscription button
-                                        if !hasSubscription {
+                                        if !appState.isPremium {
                                         ToolbarItem(placement: .topBarTrailing) {
-                                                subscriptionButton
+                                                SubscriptionButton()
                                             }
                                         }
                                         ToolbarItem(placement: .topBarTrailing) {
@@ -120,8 +120,8 @@ struct MainViewWrapper: View {
                                 }
                                 ToolbarItem(placement: .topBarTrailing) {
                                     // Subscription button
-                                    if !hasSubscription {
-                                        subscriptionButton
+                                    if !AppState.shared.isPremium {
+                                        SubscriptionButton()
                                     }
                                 }
                                 ToolbarItem(placement: .topBarTrailing) {
@@ -143,22 +143,6 @@ struct MainViewWrapper: View {
             }
         }
         
-    }
-    
-    private var subscriptionButton: some View {
-        Button {
-            //
-        } label: {
-            Image(systemName: "sparkles")
-                .symbolRenderingMode(.monochrome)
-                .foregroundColor(.appBackground)
-                .padding(4)
-                .background {
-                    Circle()
-                        .fill(Color.appGreen)
-                        .frame(width: 32, height: 32)
-                }
-        }
     }
     
     private var settingsButton: some View {

@@ -14,6 +14,7 @@ struct FullscreenVideoPlayer: View {
     @State private var player: AVPlayer?
     @State private var showControls = false
     @State private var hideTimer: Timer?
+    @State private var videoEnded = false
     
     var body: some View {
         ZStack {
@@ -33,7 +34,7 @@ struct FullscreenVideoPlayer: View {
                 }
             
             // Play/pause Overlay
-            if showControls {
+            if showControls || videoEnded {
                 Button(action: togglePlayPause) {
                     Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                         .font(.system(size: 60))
@@ -44,7 +45,7 @@ struct FullscreenVideoPlayer: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: showControls)
-        .contentShape(Rectangle())
+        .contentShape(RoundedRectangle(cornerRadius: 30))
         .onTapGesture {
             handleTap()
         }
@@ -55,12 +56,30 @@ struct FullscreenVideoPlayer: View {
     private func setupPlayer() {
         player = AVPlayer(url: videoURL)
         player?.isMuted = true
+        
+        // Add observer for video end
+        NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: player?.currentItem,
+            queue: .main
+        ) { _ in
+            videoEnded = true
+            isPlaying = false
+            showControls = true
+            cancelAutoHide()
+        }
+        
         if isPlaying {
             player?.play()
         }
     }
     
     private func cleanupPlayer() {
+        NotificationCenter.default.removeObserver(
+            self,
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: player?.currentItem
+        )
         player?.pause()
         player = nil
         cancelAutoHide()
@@ -69,19 +88,17 @@ struct FullscreenVideoPlayer: View {
     private func togglePlayPause() {
         guard let player = player else { return }
         
-        // If video ended, restart from beginning
-        if let currentItem = player.currentItem,
-           currentItem.currentTime() >= currentItem.duration {
-            player.seek(to: .zero) { [weak player] _ in
-                player?.pause()
-            }
-            isPlaying = false
-            return
+        if videoEnded {
+            player.seek(to: .zero)
+            videoEnded = false
+            isPlaying = true
+            player.play()
+        } else {
+            isPlaying.toggle()
+            isPlaying ? player.play() : player.pause()
         }
         
-        // Normal play/pause toggle
-        isPlaying.toggle()
-        isPlaying ? player.play() : player.pause()
+        showControls = true
         resetAutoHideTimer()
     }
     
@@ -94,7 +111,9 @@ struct FullscreenVideoPlayer: View {
         cancelAutoHide()
         hideTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
             withAnimation {
-                showControls = false
+                if !videoEnded {
+                    showControls = false
+                }
             }
         }
     }

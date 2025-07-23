@@ -13,8 +13,14 @@ struct CapsuleSegmentedPicker<T: Hashable & CaseIterable>: View where T.AllCases
     let titleMapping: (T) -> String
     
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+        GeometryReader { geometry in
+            let segmentCount = CGFloat(T.allCases.count)
+            let spacing: CGFloat = 8
+            let totalSpacing = spacing * (segmentCount - 1)
+            let availableWidth = geometry.size.width
+            let segmentWidth = max(0, (availableWidth - totalSpacing) / segmentCount)
+            
+            HStack(spacing: spacing) {
                 ForEach(Array(T.allCases), id: \.self) { option in
                     Button(action: {
                         withAnimation(.easeInOut(duration: 0.2)) {
@@ -22,9 +28,9 @@ struct CapsuleSegmentedPicker<T: Hashable & CaseIterable>: View where T.AllCases
                         }
                     }) {
                         Text(titleMapping(option))
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(selection == option ? .white : .gray)
-                            .padding(.horizontal, 16)
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
                             .padding(.vertical, 8)
                             .background(
                                 Capsule()
@@ -36,11 +42,11 @@ struct CapsuleSegmentedPicker<T: Hashable & CaseIterable>: View where T.AllCases
                             )
                     }
                     .buttonStyle(.plain)
-                    .frame(minHeight: 40)
+                    .frame(width: segmentWidth)
                 }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 16)
+            .frame(width: geometry.size.width, alignment: .center)
         }
+        .frame(height: 40)
     }
 }

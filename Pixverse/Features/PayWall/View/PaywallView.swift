@@ -12,8 +12,12 @@ struct PaywallView: View {
     // MARK: - ENvironment
     @Environment(\.dismiss) var dismiss
     
+    @EnvironmentObject var appState: AppState
+    
     // MARK: - States
     @StateObject private var viewModel = PaywallViewModel()
+    
+    @State private var showAlert = false
     
     // MARK: - Properties
     private let closeButtonAppearingDelay: TimeInterval = 2.0
@@ -43,10 +47,31 @@ struct PaywallView: View {
                 legalLinksButtons
             }
             .padding()
+            
+            if appState.isLoading {
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .tint(.white)
+            }
         }
         .safariSheet(url: $viewModel.selectedURL)
-        .onAppear(perform: viewModel.showCloseButtonAfterDelay)
+        .onAppear {
+            viewModel.showCloseButtonAfterDelay()
+            if appState.products.isEmpty {
+                appState.fetchProducts(paywallID: "PixverseID")
+            }
+        }
         .onDisappear { viewModel.showCloseButton = false }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("Error"),
+                message: Text(appState.errorMessage ?? "Unknown error"),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+        .onChange(of: appState.errorMessage) { newValue in
+            showAlert = newValue != nil
+        }
     }
     
     private var headerImageWithOverlay: some View {
@@ -114,15 +139,21 @@ struct PaywallView: View {
         .foregroundStyle(.gray)
     }
     
+    // Continue Button
     private var continueButton: some View {
         Button {
-            // Continue
+            guard let product = appState.product(for: viewModel.selectedOption) else {
+                appState.errorMessage = "Product not available"
+                return
+            }
+            appState.purchase(product: product)
         } label: {
             Text("Continue")
                 .frame(height: 50)
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.primaryButton)
+        .disabled(appState.isLoading)
     }
     
     private var legalLinksButtons: some View {
@@ -132,15 +163,18 @@ struct PaywallView: View {
                     viewModel.selectedURL = .privacy
                 }
                 Spacer()
-                Button("Restore Purchases") {
-                    // Restore purchases
-                }
+                Button(action: {
+                    appState.restorePurchases()
+                }, label: {
+                    Text("Restore Purcahses")
+                        .foregroundStyle(.white.opacity(0.6))
+                })
                 Spacer()
                 Button("Terms of Use") {
                     viewModel.selectedURL = .terms
                 }
             }
-            .foregroundStyle(.gray)
+            .foregroundStyle(.white.opacity(0.4))
             .font(.caption)
         }
         .frame(maxWidth: .infinity)

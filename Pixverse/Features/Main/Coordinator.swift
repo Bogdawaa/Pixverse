@@ -11,6 +11,13 @@ class AppCoordinator: ObservableObject {
     @Published var selectedTab: Int = 0
     @Published var selectedVideoTab: TemplateTab = .templates
     @Published var shouldShowSettings = false
+    
+    func navigateToVideoTemplate() {
+        withAnimation {
+            selectedTab = 1
+            selectedVideoTab = .templates
+        }
+    }
 }
 
 final class HomeCoordinator: ObservableObject {
@@ -19,6 +26,18 @@ final class HomeCoordinator: ObservableObject {
     func navigateToVideoTab(with url: URL, appCoordinator: AppCoordinator) {
         appCoordinator.selectedTab = 1
         appCoordinator.selectedVideoTab = .templates
+    }
+    
+    func showTemplateTab(for section: ContentSection) {
+        path.append(section)
+    }
+    
+    func backToRoot() {
+        path.removeLast(path.count)
+    }
+    
+    func back() {
+        path.removeLast()
     }
 }
 
@@ -42,6 +61,10 @@ final class VideoCoordinator: ObservableObject {
     
     func backToRoot() {
         path.removeLast(path.count)
+    }
+    
+    func back() {
+        path.removeLast()
     }
     
     func showGenerationProgress(with media: TextGenerationViewModel.MediaType) {

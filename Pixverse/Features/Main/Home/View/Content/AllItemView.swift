@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct AllItemsView: View {
+    
+    @EnvironmentObject var appState: AppState
+    
     let section: ContentSection
     
     private var gridLayout: [GridItem] {
@@ -38,7 +41,14 @@ struct AllItemsView: View {
                     .foregroundColor(.white)
                     .fontWeight(.bold)
             }
+            
+            if !appState.isPremium {
+            ToolbarItem(placement: .topBarTrailing) {
+                    SubscriptionButton()
+                }
+            }
         }
+        .toolbarBackground(Color.appBackground, for: .navigationBar)
     }
 }
 

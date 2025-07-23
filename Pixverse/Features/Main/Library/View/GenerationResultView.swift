@@ -10,28 +10,19 @@ import AVKit
 
 struct GenerationResult: View {
     
-    @StateObject private var viewModel = GenerationResultViewModel()
+    @ObservedObject var viewModel: GenerationResultViewModel
 
-    @State var item: VideoGeneration
-    @State private var isPlaying = true
-    @State private var videoThumbnail: UIImage?
-    @State private var isLoadingThumbnail = false
-    @State private var thumbnailError: Error?
-    @State private var showFullscreenPlayer = false
-    
-    
     var body: some View {
         
         ZStack {
             Color.appBackground.ignoresSafeArea()
             
             VStack {
-                if let videoURL = item.videoUrl {
+                if let videoURL = viewModel.item.videoUrl {
                     thumbnailView(url: videoURL)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                         .padding(.horizontal, 106)
                         .padding(.vertical, 24)
-                        .frame(maxWidth: .infinity)
                 }
                 
                 // download button
@@ -67,7 +58,7 @@ struct GenerationResult: View {
                     }
                 }
                 
-                SocialMediaButtonsFooter()
+                SocialMediaButtonsFooter(shareItem: viewModel.item.videoUrl)
             }
             .background(Color.appCard)
             .clipShape(RoundedRectangle(cornerRadius: 30))
@@ -75,13 +66,13 @@ struct GenerationResult: View {
             .padding(.vertical, 84)
         }
         .onAppear {
-            if let videoUrl = item.videoUrl {
-                loadThumbnail(from: videoUrl)
+            if let videoUrl = viewModel.item.videoUrl {
+                viewModel.loadThumbnail(from: videoUrl)
             }
         }
-        .navigationDestination(isPresented: $showFullscreenPlayer) {
-            if let videoUrl = item.videoUrl {
-                FullscreenVideoPlayer(videoURL: videoUrl, isPlaying: $isPlaying)
+        .navigationDestination(isPresented: $viewModel.showFullscreenPlayer) {
+            if let videoUrl = viewModel.item.videoUrl {
+                FullscreenVideoPlayer(videoURL: videoUrl, isPlaying: $viewModel.isPlaying)
             }
         }
     }
@@ -92,14 +83,15 @@ struct GenerationResult: View {
     @ViewBuilder
     private func thumbnailView(url: URL) -> some View {
         Group {
-            if let thumbnail = videoThumbnail {
+            if let thumbnail = viewModel.videoThumbnail {
                 Image(uiImage: thumbnail)
                     .resizable()
                     .scaledToFill()
+                    .frame(width: 146, height: 168)
                     .overlay {
                         // Show Full screen Player  button
                         Button(action: {
-                            showFullscreenPlayer = true
+                            viewModel.showFullscreenPlayer = true
                         }) {
                             Image(systemName: "play.fill")
                                 .foregroundColor(.white)
@@ -107,7 +99,7 @@ struct GenerationResult: View {
                                 .padding()
                         }
                     }
-            } else if isLoadingThumbnail {
+            } else if viewModel.isLoadingThumbnail {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.gray.opacity(0.3))
@@ -120,41 +112,4 @@ struct GenerationResult: View {
             }
         }
     }
-    
-    private func loadThumbnail(from url: URL) {
-        guard videoThumbnail == nil, !isLoadingThumbnail else { return }
-        
-        isLoadingThumbnail = true
-        
-        if let cachedImage = ThumbnailCache.shared.get(for: url) {
-            videoThumbnail = cachedImage
-            isLoadingThumbnail = false
-            return
-        }
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            let asset = AVAsset(url: url)
-            let generator = AVAssetImageGenerator(asset: asset)
-            generator.appliesPreferredTrackTransform = true
-            
-            do {
-                let imageRef = try generator.copyCGImage(at: CMTime(seconds: 1, preferredTimescale: 1), actualTime: nil)
-                let thumbnail = UIImage(cgImage: imageRef)
-                
-                // Cache the thumbnail
-                ThumbnailCache.shared.set(thumbnail, for: url)
-                
-                DispatchQueue.main.async {
-                    self.videoThumbnail = thumbnail
-                    self.isLoadingThumbnail = false
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self.isLoadingThumbnail = false
-                    print("Thumbnail generation failed: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
-    
 }

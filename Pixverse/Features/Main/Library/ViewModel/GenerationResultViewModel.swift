@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVKit
 
 final class GenerationResultViewModel: ObservableObject {
     
@@ -31,11 +32,23 @@ final class GenerationResultViewModel: ObservableObject {
         }
     }
     
-    @Published var generatedVideoUrl: String?
-    @Published var downloadState: DownloadState = .idle
+    @Published var isPlaying = true
+    @Published var videoThumbnail: UIImage?
+    @Published var isLoadingThumbnail = false
+    @Published var thumbnailError: Error?
+    @Published var showFullscreenPlayer = false
     
+//    @Published var generatedVideoUrl: String?
+    @Published var downloadState: DownloadState = .idle
+    var item: VideoGeneration
+    
+    init(item: VideoGeneration) {
+        self.item = item
+    }
+    
+    @MainActor
     func downloadVideo() async {
-        guard let videoURL = generatedVideoUrl, let videoURL = URL(string: videoURL) else { return }
+        guard let videoURL = item.videoUrl else { return }
         
         downloadState = .inProgress
         
@@ -44,6 +57,40 @@ final class GenerationResultViewModel: ObservableObject {
             downloadState = .success
         } catch {
             downloadState = .failure(error)
+        }
+    }
+    
+    func loadThumbnail(from url: URL) {
+        isLoadingThumbnail = true
+        
+        if let cachedImage = ThumbnailCache.shared.get(for: url) {
+            videoThumbnail = cachedImage
+            isLoadingThumbnail = false
+            return
+        }
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            let asset = AVAsset(url: url)
+            let generator = AVAssetImageGenerator(asset: asset)
+            generator.appliesPreferredTrackTransform = true
+            
+            do {
+                let imageRef = try generator.copyCGImage(at: CMTime(seconds: 1, preferredTimescale: 1), actualTime: nil)
+                let thumbnail = UIImage(cgImage: imageRef)
+                
+                // Cache the thumbnail
+                ThumbnailCache.shared.set(thumbnail, for: url)
+                
+                DispatchQueue.main.async {
+                    self.videoThumbnail = thumbnail
+                    self.isLoadingThumbnail = false
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.isLoadingThumbnail = false
+                    print("Thumbnail generation failed: \(error.localizedDescription)")
+                }
+            }
         }
     }
 }

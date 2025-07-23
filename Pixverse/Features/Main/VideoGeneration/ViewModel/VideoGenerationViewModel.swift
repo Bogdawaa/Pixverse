@@ -9,7 +9,7 @@ import SwiftUI
 
 @MainActor
 final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewModelProtocol {
-    
+        
     struct GenerationParameters {
         let templateId: Int
         let image: UIImage?
@@ -49,11 +49,15 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
     @Published private(set) var showDownloadAlert = false
     @Published private(set) var downloadAlertMessage = ""
     
+    @Published var showAlert = false
+    
     @Published var activeGenerations: [VideoGeneration] = []
+    
     
     private let storage: VideoGenerationStorageService
     private let templateService: TemplateServiceProtocol
     private let statusCheckInterval: TimeInterval = 30
+    private let maxConcurrentGenerations = 2
 
 
     init(
@@ -68,6 +72,16 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
     
     // MARK: - Public Methods
     func generate(with parameters: GenerationParameters) async {
+        loadGenerations()
+        
+        let generating = activeGenerations.filter { $0.status == .generating }.count
+        guard generating < maxConcurrentGenerations else {
+            print("ACTIVE GENERATION: \(generating)")
+            errorMessage = "Maximum number of generations is limited to \(maxConcurrentGenerations). Please wait for current generations to finish."
+            showAlert = true
+            return
+        }
+        
         if let image = parameters.image {
             await generateTemplateToVideo(templateId: parameters.templateId, image: image)
         } else if let videoUrl = parameters.videoUrl {
@@ -93,7 +107,6 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
     private func generateTemplateToVideo(templateId: Int, image: UIImage) async {
         isLoading = true
         error = nil
-
         
         guard let imageData = image.jpegData(compressionQuality: 0.5) else {
             error = NSError(domain: "Image converting failed", code: -1)
@@ -128,11 +141,13 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
                 checkStatusUntilCompleted(for: generation)
             } else {
                 errorMessage = "Generation failed. Try to change image for generation"
+                showAlert = true
                 print("generation template to video failed")
             }
             
         } catch let err {
             // Handle errors
+            showAlert = true
             errorMessage = "Generation failed. Try to change image for generation"
             error = err
             isLoading = false
@@ -171,12 +186,14 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
 
                 print("Video-to-video generation started. Video ID: \(response.videoId)")
             } else {
+                showAlert = true
                 errorMessage = "Generation failed. Try to change video for generation"
                 print("generation video to video failed")
 
             }
         } catch let err {
             // Handle errors
+            showAlert = true
             errorMessage = "Generation failed. Try to change video for generation"
             error = err
             isLoading = false
@@ -187,6 +204,8 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
         Task {
             while true {
                 do {
+                    try await Task.sleep(nanoseconds: UInt64(statusCheckInterval * 1_000_000_000))
+
                     let status = try await templateService.checkVideoStatus(videoId: generation.generationId)
                     print("status \(status.status)")
                     
@@ -213,7 +232,8 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
                             }
                             return
                         }
-                    case "failed":
+                    case "error":
+                        errorMessage = "Generation failed. Please try again."
                         error = NSError(domain: "Generation failed", code: -2)
                         isLoading = false
                         print("Status Failed")
@@ -227,10 +247,9 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
                     default:
                         isLoading = true
                     }
-                    
-                    try await Task.sleep(nanoseconds: UInt64(statusCheckInterval * 1_000_000_000))
-                    
                 } catch {
+                    showAlert = true
+                    errorMessage = "Generation failed. Please try again."
                     self.error = error
                     isLoading = false
                     break
@@ -260,10 +279,4 @@ extension VideoGenerationViewModel {
             print("Error loading generations: \(error)")
         }
     }
-    
-    func cleanup() {
-        try? storage.cleanupGenerations()
-        loadGenerations()
-    }
-
 }

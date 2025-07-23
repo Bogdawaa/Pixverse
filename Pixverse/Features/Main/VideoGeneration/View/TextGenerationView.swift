@@ -14,11 +14,14 @@ struct TextGenerationView: View {
     @ObservedObject var viewModel: TextGenerationViewModel
     
     @State private var selectedItem: PhotosPickerItem?
+    @State private var isShowPaywall = false
+    @State private var showAlert = false
     
+    @EnvironmentObject var appState: AppState
     @EnvironmentObject private var appCoordinator: AppCoordinator
     @EnvironmentObject private var videoCoordinator: VideoCoordinator
     @Environment(\.dismiss) var dismiss
-
+    
     
     var body: some View {
         ScrollView {
@@ -125,19 +128,34 @@ struct TextGenerationView: View {
                             prompt: nil,
                             image: nil,
                             videoURL: url,
-                            templateId: (viewModel.selectedStyleItem as? StyleItem)?.id // TODO: id or template id????
+                            templateId: (viewModel.selectedStyleItem as? StyleItem)?.templateId
                         )
                     }
                     
                     Task {
-                        videoCoordinator.showGenerationProgress(with: media)
-                        await viewModel.generate(with: params)
+                        if appState.isPremium {
+                            print("before \(viewModel.activeGenerations)")
+                            await viewModel.generate(with: params)
+                            print("after \(viewModel.activeGenerations)")
+                            if viewModel.errorMessage == nil && viewModel.error == nil {
+                                videoCoordinator.showGenerationProgress(with: media)
+                            } else {
+                                showAlert = true
+                            }
+                        } else {
+                            isShowPaywall = true
+                        }
                     }
                 }
             } label: {
                 if viewModel.isLoading {
-                    ProgressView()
-                        .tint(.white)
+                    HStack {
+                        ProgressView()
+                            .tint(.white)
+                        Text("Generate")
+                            .frame(height: 50)
+                            .frame(maxWidth: .infinity)
+                    }
                 } else {
                     Text("Generate")
                         .frame(height: 50)
@@ -157,11 +175,25 @@ struct TextGenerationView: View {
         } message: {
             Text("To upload an image, the app needs access to your photo library")
         }
+        .alert("Error",
+               isPresented: $showAlert) {
+            Button("OK", role: .cancel) {
+                showAlert = false
+                viewModel.errorMessage = nil
+            }
+        } message: {
+            Text(viewModel.errorMessage ?? "An error occurred during generation")
+        }
         .photosPicker(isPresented: $viewModel.showMediaPicker,
                       selection: $selectedItem,
                       matching: viewModel.isUploadPhotoEnabled ? .images : .videos)
         .onChange(of: selectedItem) { newItem in
             viewModel.handleMediaSelection(newItem)
+        }
+        .fullScreenCover(isPresented: $isShowPaywall) {
+            PaywallView(onDismiss: {
+                isShowPaywall = false
+            })
         }
     }
         
@@ -183,11 +215,6 @@ struct TextGenerationView: View {
         }
         .background(.appCard)
         .clipShape(RoundedRectangle(cornerRadius: 30))
-    }
-    
-    private func generateContent() {
-        // Handle generation logic
-        print("Generating content with prompt: \(viewModel.prompt)")
     }
     
     private func openAppSettings() {

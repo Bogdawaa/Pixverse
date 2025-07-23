@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F057A39C2E304B76008B428A /* SwiftHelper in Frameworks */ = {isa = PBXBuildFile; productRef = F057A39B2E304B76008B428A /* SwiftHelper */; };
+		F057A39F2E304B92008B428A /* ApphudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F057A39E2E304B92008B428A /* ApphudSDK */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		F0E5087A2E1D1D8E0028855C /* Pixverse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pixverse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F057A39C2E304B76008B428A /* SwiftHelper in Frameworks */,
+				F057A39F2E304B92008B428A /* ApphudSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = Pixverse;
 			packageProductDependencies = (
+				F057A39B2E304B76008B428A /* SwiftHelper */,
+				F057A39E2E304B92008B428A /* ApphudSDK */,
 			);
 			productName = Pixverse;
 			productReference = F0E5087A2E1D1D8E0028855C /* Pixverse.app */;
@@ -108,6 +117,8 @@
 			mainGroup = F0E508712E1D1D8E0028855C;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				F057A39A2E304B76008B428A /* XCRemoteSwiftPackageReference "SwiftHelper" */,
+				F057A39D2E304B92008B428A /* XCRemoteSwiftPackageReference "ApphudSDK" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F0E5087B2E1D1D8E0028855C /* Products */;
@@ -359,6 +370,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F057A39A2E304B76008B428A /* XCRemoteSwiftPackageReference "SwiftHelper" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Vladimir089/SwiftHelper";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.2;
+			};
+		};
+		F057A39D2E304B92008B428A /* XCRemoteSwiftPackageReference "ApphudSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apphud/ApphudSDK";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.6.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F057A39B2E304B76008B428A /* SwiftHelper */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F057A39A2E304B76008B428A /* XCRemoteSwiftPackageReference "SwiftHelper" */;
+			productName = SwiftHelper;
+		};
+		F057A39E2E304B92008B428A /* ApphudSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F057A39D2E304B92008B428A /* XCRemoteSwiftPackageReference "ApphudSDK" */;
+			productName = ApphudSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F0E508722E1D1D8E0028855C /* Project object */;
 }

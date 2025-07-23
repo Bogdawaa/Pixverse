@@ -32,10 +32,8 @@ struct ContentSectionsView: View {
             // TODO: Change ProgressView style
             if viewModel.isLoading && viewModel.sections.isEmpty {
                 ProgressView()
-                    .padding(20)
-                    .background(.regularMaterial)
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
+                    .scaleEffect(1.5)
+                    .tint(.white)
             }
             
             // if empty

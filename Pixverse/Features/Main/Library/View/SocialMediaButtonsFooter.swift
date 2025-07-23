@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct SocialMediaButtonsFooter: View {
+    
+    var shareItem: URL?
+    
     var body: some View {
         HStack(spacing: 12) {
             SocialMediaButton(
@@ -30,10 +33,15 @@ struct SocialMediaButtonsFooter: View {
                 label: "WhatsApp"
             )
             
-            SocialMediaButton(
-                icon: Image(systemName: "ellipsis"),
-                label: "Still"
-            )
+            if let shareItem = shareItem {
+                ShareLink(item: shareItem) {
+                    SocialMediaButton(
+                        icon: Image(systemName: "ellipsis"),
+                        label: "Still"
+                    )
+                    .disabled(true) // disabled for sharelink interaction collision
+                }
+            }
         }
         .padding()
     }

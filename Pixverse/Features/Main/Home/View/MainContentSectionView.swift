@@ -29,7 +29,6 @@ struct MainContentSectionView: View {
                 if section.showAllButton {
                     Button(action: {
                         appCoordinator.selectedTab = 1
-//                        appCoordinator.selectedVideoTab = .templates
                         videoCoordinator.showAllItems(for: section)
                     }) {
                         HStack(spacing: 4) {

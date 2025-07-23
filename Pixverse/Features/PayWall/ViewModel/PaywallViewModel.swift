@@ -38,4 +38,12 @@ final class PaywallViewModel: ObservableObject {
             }
         }
     }
+    
+    func productId(for period: SubscriptionModel.PeriodType) -> String {
+        switch period {
+        case .week: return "weekly_product_id"
+        case .month: return "monthly_product_id"
+        case .year: return "yearly_product_id"
+        }
+    }
 }

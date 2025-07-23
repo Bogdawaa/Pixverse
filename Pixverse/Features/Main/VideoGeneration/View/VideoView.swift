@@ -19,6 +19,7 @@ struct VideoView: View {
                     tab.rawValue
                 }
                 .padding(.vertical, 8)
+                .padding(.horizontal, 16)
                 
                 // Main Content
                 Group {
