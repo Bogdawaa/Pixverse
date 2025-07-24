@@ -21,9 +21,7 @@ class AppState: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
-    var userId: String {
-        Apphud.userID()
-    }
+    @Published var userId: String = Apphud.userID()
     
     func fetchProducts(paywallID: String) {
         isLoading = true
@@ -61,7 +59,7 @@ class AppState: ObservableObject {
     }
     
     func checkSubscriptionStatus() {
-        self.isPremium = SwiftHelper.apphudHelper.isProUser()
+//        self.isPremium = SwiftHelper.apphudHelper.isProUser()
 //        self.isPremium = true
     }
     
