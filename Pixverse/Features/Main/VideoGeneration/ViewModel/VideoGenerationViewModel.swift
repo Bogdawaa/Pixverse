@@ -53,12 +53,10 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
     
     @Published var activeGenerations: [VideoGeneration] = []
     
-    
+    private let generationManager = GenerationManager.shared
     private let storage: VideoGenerationStorageService
     private let templateService: TemplateServiceProtocol
     private let statusCheckInterval: TimeInterval = 30
-    private let maxConcurrentGenerations = 2
-
 
     init(
         templateService: TemplateServiceProtocol = TemplateService(networkClient: DefaultNetworkClientImpl(baseURL: Constants.baseURL)),
@@ -72,15 +70,23 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
     
     // MARK: - Public Methods
     func generate(with parameters: GenerationParameters) async {
-        loadGenerations()
-        
-        let generating = activeGenerations.filter { $0.status == .generating }.count
-        guard generating < maxConcurrentGenerations else {
-            print("ACTIVE GENERATION: \(generating)")
-            errorMessage = "Maximum number of generations is limited to \(maxConcurrentGenerations). Please wait for current generations to finish."
+        defer {
+            Task {
+                await generationManager.endGeneration()
+            }
+        }
+                
+        let canStart = await generationManager.canStartGeneration()
+        guard canStart else {
+            errorMessage = "Maximum number of concurrent generations is limited to \(await generationManager.maxConcurrentGenerations). Please wait for current generations to finish."
             showAlert = true
             return
         }
+        // Increse generations
+        await generationManager.startGeneration()
+        
+        loadGenerations()
+
         
         if let image = parameters.image {
             await generateTemplateToVideo(templateId: parameters.templateId, image: image)

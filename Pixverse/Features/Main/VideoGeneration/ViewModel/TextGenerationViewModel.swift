@@ -65,13 +65,7 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     @Published var errorMessage: String?
     @Published var showAlert: Bool = false
     
-    @Published var activeGenerations: [VideoGeneration] = [] {
-        didSet {
-            if activeGenerations.count > maxConcurrentGenerations && oldValue.count <= maxConcurrentGenerations {
-                showAlert = true
-            }
-        }
-    }
+    @Published var activeGenerations: [VideoGeneration] = []
     
     @Published var isUploadPhotoEnabled = false {
         didSet {
@@ -100,7 +94,8 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     private let storage: VideoGenerationStorageService
     private let templateService: TemplateServiceProtocol
     private let statusCheckInterval: TimeInterval = 30
-    private let maxConcurrentGenerations = 2
+    private let generationManager = GenerationManager.shared
+
     
     init(templateService: TemplateServiceProtocol = TemplateService(networkClient: DefaultNetworkClientImpl(baseURL: Constants.baseURL)),
          storage: VideoGenerationStorageService = VideoGenerationStorageService()
@@ -187,15 +182,23 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     }
     
     func generate(with parameters: GenerationParameters) async  {
-       loadGenerations()
+        defer {
+            Task {
+                await generationManager.endGeneration()
+            }
+        }
         
-        let generating = activeGenerations.filter { $0.status == .generating }.count
-        guard generating < maxConcurrentGenerations else {
-            print("ACTIVE GENERATION: \(generating)")
-            errorMessage = "Maximum number of generations is limited to \(maxConcurrentGenerations). Please wait for current generations to finish."
+        let canStart = await generationManager.canStartGeneration()
+        guard canStart else {
+            errorMessage = "Maximum number of concurrent generations is limited to \(await generationManager.maxConcurrentGenerations). Please wait for current generations to finish."
             showAlert = true
             return
         }
+        // Increse generations
+        await generationManager.startGeneration()
+       
+        
+        loadGenerations()
         
         switch selectedMedia {
         case .photo(let uiImage):
