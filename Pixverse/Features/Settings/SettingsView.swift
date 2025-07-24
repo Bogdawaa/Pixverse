@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import MessageUI
 
 struct SettingsView: View {
     
+    @EnvironmentObject var appState: AppState
     @StateObject private var viewModel = SettingsViewModel()
     
     @State private var showMailUnavailableAlert = false
@@ -47,6 +49,16 @@ struct SettingsView: View {
                             .labelsHidden()
                             .tint(.appGreen)
                     }
+                    
+                    HStack {
+                        // переключатель для тестирования
+                        Text("Is Premium User")
+                            .padding(.leading, 16)
+                        Spacer()
+                        Toggle("", isOn: $appState.isPremium)
+                            .labelsHidden()
+                            .tint(.appGreen)
+                    }
                 }
                 .listRowBackground(Color.appBackground)
                 
@@ -59,16 +71,13 @@ struct SettingsView: View {
                 ) {
                     // Row 1
                     Button {
-                    #if targetEnvironment(simulator)
-                        print("Simulator detected - showing preview email")
-                        viewModel.showMailComposer = true 
-                    #else
-                        if MFMailComposeViewController.canSendMail() {
-                            viewModel.showMailComposer = true
-                        } else {
-                            showMailUnavailableAlert = true
+                        if let emailURL = viewModel.getEmailURL() {
+                            if UIApplication.shared.canOpenURL(URL(string: "mailto:")!) {
+                                UIApplication.shared.open(emailURL, options: [:], completionHandler: nil)
+                            } else {
+                                showMailUnavailableAlert = true
+                            }
                         }
-                    #endif
                     } label: {
                         Text("Contact us")
                             .padding(.leading, 16)

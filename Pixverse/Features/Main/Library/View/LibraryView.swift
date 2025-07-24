@@ -15,8 +15,12 @@ struct LibraryView: View {
     @StateObject private var viewModel: LibraryViewModel = LibraryViewModel()
     
     private var gridLayout: [GridItem] {
-        [GridItem(.adaptive(minimum: 175, maximum: 200), spacing: 0)]
+        [
+            GridItem(.fixed(175), spacing: 8),
+            GridItem(.fixed(175), spacing: 8)
+        ]
     }
+    
     
     var body: some View {
         ZStack {
@@ -32,6 +36,9 @@ struct LibraryView: View {
             }
             .padding()
         }
+        .onAppear {
+            viewModel.loadGenerations()
+        }
     }
     
     private var emptyContentView: some View {
@@ -43,7 +50,7 @@ struct LibraryView: View {
                         RoundedRectangle(cornerRadius: 30)
                             .stroke(Color.white.opacity(0.05), lineWidth: 1)
                     )
-                    .frame(width: 175, height: 225)
+                    .frame(height: 225)
                 
                 RoundedRectangle(cornerRadius: 30)
                     .fill(.appCard)
@@ -51,7 +58,7 @@ struct LibraryView: View {
                         RoundedRectangle(cornerRadius: 30)
                             .stroke(Color.white.opacity(0.05), lineWidth: 1)
                     )
-                    .frame(width: 175, height: 225)
+                    .frame(height: 225)
             }
             
             Text("Start your first creation!")
@@ -83,22 +90,32 @@ struct LibraryView: View {
                 .edgesIgnoringSafeArea(.all)
             
             ScrollView {
-                LazyVGrid(columns: gridLayout, spacing: 24) {
-                    ForEach(viewModel.generations, id: \.id) { item in
-                        GenerationItemView(item: item)
-                            .frame(width: 175)
-                            .frame(height: 225)
+                if viewModel.generations.count == 1 {
+                    HStack(alignment: .top) {
+                        GenerationItemView(item: viewModel.generations[0])
                             .onTapGesture {
-                                viewModel.selectedGeneration = item
+                                viewModel.selectedGeneration = viewModel.generations[0]
                             }
+                        Spacer()
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 24)
+                } else {
+                    LazyVGrid(columns: gridLayout, spacing: 8) {
+                        ForEach(viewModel.generations, id: \.id) { item in
+                            GenerationItemView(item: item)
+                                .frame(height: 225)
+                                .onTapGesture {
+                                    viewModel.selectedGeneration = item
+                                }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 24)
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 24)
             }
-        }
-        .onAppear {
-            viewModel.loadGenerations()
+            .scrollIndicators(.hidden)
         }
         .navigationDestination(
             isPresented: Binding(

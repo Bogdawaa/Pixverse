@@ -67,7 +67,9 @@ struct GenerationResult: View {
         }
         .onAppear {
             if let videoUrl = viewModel.item.videoUrl {
-                viewModel.loadThumbnail(from: videoUrl)
+                if viewModel.videoThumbnail == nil {
+                    viewModel.loadThumbnail(from: videoUrl)
+                }
             }
         }
         .navigationDestination(isPresented: $viewModel.showFullscreenPlayer) {
@@ -115,8 +117,8 @@ struct GenerationResult: View {
                     .overlay(
                         Image(systemName: "photo")
                             .foregroundColor(.white)
-                            .frame(width: 146, height: 168)
                     )
+                    .frame(width: 146, height: 168)
             }
         }
     }

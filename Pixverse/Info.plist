@@ -10,5 +10,9 @@
 	<string></string>
 	<key>CFBundleSignature</key>
 	<string></string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>mailto</string>
+	</array>
 </dict>
 </plist>

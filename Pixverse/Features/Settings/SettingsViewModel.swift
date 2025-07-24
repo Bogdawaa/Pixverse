@@ -8,6 +8,7 @@
 import SwiftUI
 import MessageUI
 import NotificationCenter
+import ApphudSDK
 
 final class SettingsViewModel: ObservableObject {
     
@@ -82,17 +83,20 @@ final class SettingsViewModel: ObservableObject {
     }
     
     func getEmailURL() -> URL? {
+        let recipient = "support@pixverse.com"
         let subject = "Pixverse Support"
         let body = """
-            User ID: \(appState.userId)
+            User ID: \(Apphud.userID())
             
             Please describe your issue below:
             """
         
         let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            
+        let mailtoURLString = "mailto:\(recipient)?subject=\(encodedSubject)&body=\(encodedBody)"
         
-        return URL(string: "mailto:test@email.com?subject=\(encodedSubject)&body=\(encodedBody)")
+        return URL(string: mailtoURLString)
     }
     
     private func loadAppVersion() {
