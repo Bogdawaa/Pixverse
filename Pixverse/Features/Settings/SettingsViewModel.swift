@@ -7,21 +7,21 @@
 
 import SwiftUI
 import MessageUI
+import NotificationCenter
 
 final class SettingsViewModel: ObservableObject {
     
     @EnvironmentObject var appState: AppState
 
-    @Published var showNotificationPermission = false
-    @Published var isToggleOn = false
     @Published private(set) var appVersion: String = "1.0.0"
+    @Published var showNotificationPermission = false
     @Published var selectedURL: AppURL?
-    
     @Published var showMailComposer = false
     @Published var mailComposeResult: Result<MFMailComposeResult, Error>? = nil
-    
+    @Published var isNotificationToggleOn = false
     
     private let notificationCenter: UNUserNotificationCenter
+    private var initialLoad = true
 
     var canSendEmail: Bool {
         MFMailComposeViewController.canSendMail()
@@ -32,21 +32,53 @@ final class SettingsViewModel: ObservableObject {
         notificationCenter: UNUserNotificationCenter = .current()
     ) {
         self.notificationCenter = notificationCenter
+        loadAppVersion()
+        checkNotificationStatus()
     }
     
-    func requestNotificationPermission() async -> Bool {
-        do {
-            let granted = try await notificationCenter.requestAuthorization(
-                options: [.alert, .sound, .badge]
-            )
-            await MainActor.run {
-                self.showNotificationPermission = false
+    func requestNotificationPermission() {
+        Task {
+            do {
+                let granted = try await notificationCenter.requestAuthorization(
+                    options: [.alert, .sound, .badge]
+                )
+                await MainActor.run {
+                    isNotificationToggleOn = granted
+                }
+                return
+            } catch {
+                print("Notification permission error: \(error.localizedDescription)")
+                isNotificationToggleOn = false
+                return
             }
-            return granted
-        } catch {
-            print("Notification permission error: \(error.localizedDescription)")
-            return false
         }
+    }
+    
+    func checkNotificationStatus() {
+        Task {
+            let settings = await notificationCenter.notificationSettings()
+            await MainActor.run {
+                isNotificationToggleOn = settings.authorizationStatus == .authorized
+                initialLoad = false
+            }
+        }
+    }
+    
+    func toggleNotifications(newValue: Bool) {
+        if initialLoad { return }
+        
+        if newValue {
+            showNotificationPermission = true
+        } else {
+            disableNotifications()
+        }
+    }
+        
+    func disableNotifications() {
+        notificationCenter.removeAllPendingNotificationRequests()
+        notificationCenter.removeAllDeliveredNotifications()
+        isNotificationToggleOn = false
+        print("Notifications disabled")
     }
     
     func getEmailURL() -> URL? {
@@ -61,5 +93,11 @@ final class SettingsViewModel: ObservableObject {
         let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         
         return URL(string: "mailto:test@email.com?subject=\(encodedSubject)&body=\(encodedBody)")
+    }
+    
+    private func loadAppVersion() {
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            appVersion = version
+        }
     }
 }

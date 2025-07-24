@@ -39,7 +39,11 @@ struct SettingsView: View {
                         Text("Notifications")
                             .padding(.leading, 16)
                         Spacer()
-                        Toggle("", isOn: $viewModel.isToggleOn)
+                        Toggle("", isOn: Binding(
+                            get: { viewModel.isNotificationToggleOn },
+                            set: { newValue in
+                                viewModel.toggleNotifications(newValue: newValue)
+                            }))
                             .labelsHidden()
                             .tint(.appGreen)
                     }
@@ -104,19 +108,23 @@ struct SettingsView: View {
             Spacer()
         }
         .background(Color.appBackground)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Subscribers")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(.white)
+            }
+        }
         .safariSheet(url: $viewModel.selectedURL)
         .alert(isPresented: $viewModel.showNotificationPermission) {
             Alert(
                 title: Text("Allow Notifications"),
                 message: Text("This app will be able to send you messages in your notification center"),
                 primaryButton: .default(Text("Allow"), action: {
-                    Task {
-                        _ = await viewModel.requestNotificationPermission()
-                    }
-                    
+                    viewModel.requestNotificationPermission()
                 }),
                 secondaryButton: .cancel(Text("Cancel"), action: {
-                    //
+                    viewModel.isNotificationToggleOn = false
                 })
             )
         }
