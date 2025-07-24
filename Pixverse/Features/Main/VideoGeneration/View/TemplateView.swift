@@ -68,11 +68,17 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                     }
                 }, label: {
                     HStack {
-                        Text("Generate")
-                            .frame(height: 50)
-                        if !appState.isPremium {
-                            Image(systemName: "sparkles")
-                                .foregroundStyle(.appBackground)
+                        if viewModel.isLoading {
+                            ProgressView()
+                            Text("Generating")
+                                .frame(height: 50)
+                        } else {
+                            Text("Generate")
+                                .frame(height: 50)
+                            if !appState.isPremium {
+                                Image(systemName: "sparkles")
+                                    .foregroundStyle(.appBackground)
+                            }
                         }
                     }
                     .frame(maxWidth: .infinity)
