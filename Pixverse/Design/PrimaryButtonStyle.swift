@@ -13,7 +13,6 @@ struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
-            .bold()
             .foregroundStyle(isEnabled ? .black : Color.appSecondary)
             .background(isEnabled ? .appGreen: .appCard2)
             .clipShape(Capsule(style: .continuous))
