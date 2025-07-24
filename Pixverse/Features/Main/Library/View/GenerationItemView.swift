@@ -23,12 +23,6 @@ struct GenerationItemView: View {
         ZStack(alignment: .bottom) {
             if let videoURL = item.videoUrl {
                 thumbnailView(url: videoURL)
-                    .overlay {
-                        Image(systemName: "play.fill")
-                            .foregroundColor(.white)
-                            .imageScale(.large)
-                            .padding()
-                    }
             } else if item.status == .generating {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -40,6 +34,7 @@ struct GenerationItemView: View {
             }
         }
         .frame(width: 175, height: 225)
+
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .contentShape(RoundedRectangle(cornerRadius: 20))
         .onAppear {
@@ -58,16 +53,22 @@ struct GenerationItemView: View {
                     .resizable()
                     .scaledToFill()
                     .overlay(alignment: .bottom) {
-                        LinearGradient(
-                            gradient: Gradient(
-                                colors: [
-                                    .black.opacity(0),
-                                    .appBackground.opacity(0.8)
-                                ]
-                            ),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                        ZStack {
+                            LinearGradient(
+                                gradient: Gradient(
+                                    colors: [
+                                        .black.opacity(0),
+                                        .appBackground.opacity(0.8)
+                                    ]
+                                ),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            Image(systemName: "play.fill")
+                                .foregroundColor(.white)
+                                .imageScale(.large)
+                                .padding()
+                        }
                     }
             } else if isLoadingThumbnail {
                 ProgressView()

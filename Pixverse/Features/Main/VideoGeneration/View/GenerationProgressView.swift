@@ -40,11 +40,9 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
             
             if viewModel.isGenerationComplete {
                 VStack {
-                    ScrollView{
-                        generationResult
-                        Spacer()
-                        templatesFooterView
-                    }
+                    generationResult
+                    Spacer()
+                    templatesFooterView
                 }
                 .transition(.opacity)
                 .navigationDestination(isPresented: $showFullscreenPlayer) {
@@ -91,9 +89,16 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                 .padding(.horizontal, 78)
                 .overlay {
                     if viewModel.isLoading {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .tint(.white)
+                        ZStack {
+                            Color.appBackground.opacity(0.3)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                .padding(.vertical, 24)
+                                .padding(.horizontal, 78)
+                            
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .tint(.white)
+                        }
                     }
                 }
             
@@ -118,17 +123,6 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .padding(.horizontal, 106)
                     .padding(.vertical, 24)
-                    .overlay {
-                    // Show full screen button
-                    Button(action: {
-                        showFullscreenPlayer = true
-                    }) {
-                        Image(systemName: "play.fill")
-                            .foregroundColor(.white)
-                            .imageScale(.large)
-                            .padding()
-                    }
-                }
             }
             
             // download button
@@ -169,7 +163,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
         }
         .background(Color.appCard)
         .clipShape(RoundedRectangle(cornerRadius: 30))
-        .padding()
+        .padding(16)
     }
     
     // MARK: - Footer with other templates
@@ -183,7 +177,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
         )
         .background(.appCard)
         .clipShape(RoundedRectangle(cornerRadius: 30))
-        .padding()
+        .padding(16)
     }
     
     // MARK: - Video Preview
@@ -220,9 +214,21 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                 Image(uiImage: thumbnail)
                     .resizable()
                     .scaledToFill()
+                    .frame(width: 146, height: 168)
+                    .overlay {
+                    // Show full screen button
+                    Button(action: {
+                        showFullscreenPlayer = true
+                    }) {
+                        Image(systemName: "play.fill")
+                            .foregroundColor(.white)
+                            .imageScale(.large)
+                            .padding()
+                    }
+                }
             } else if isLoadingThumbnail {
                 ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(width: 146, height: 168)
                     .background(Color.gray.opacity(0.3))
             } else {
                 Color.gray.opacity(0.3)
@@ -230,6 +236,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                         Image(systemName: "photo")
                             .foregroundColor(.white)
                     )
+                    .frame(width: 146, height: 168)
             }
         }
     }

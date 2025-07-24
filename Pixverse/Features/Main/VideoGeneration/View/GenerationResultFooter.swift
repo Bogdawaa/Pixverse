@@ -36,13 +36,23 @@ struct GenerationResultFooter: View {
                             .onTapGesture {
                                 onItemSelected?(item)
                             }
-                        
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .frame(height: 121)
             }
+            .frame(height: 121 + 16)
+            .padding(.bottom)
         }
         .toolbarBackground(Color.appBackground, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Photo generation")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(.white)
+            }
+        }
         .background(.appCard)
         .onAppear {
             visibleItems = Array(items.prefix(5))

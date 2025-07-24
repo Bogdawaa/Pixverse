@@ -128,11 +128,11 @@ struct MainViewWrapper: View {
                                 ToolbarItem(placement: .topBarTrailing) {
                                     SettingsButton()
                                 }
-                                
                             }
                             .navigationDestination(isPresented: $appCoordinator.shouldShowSettings) {
                                 SettingsView()
                                     .environmentObject(appCoordinator)
+                                
                             }
                     }
                     .tag(2)
