@@ -93,6 +93,7 @@ struct SettingsView: View {
                 }
                 .listRowBackground(Color.appBackground)
             }
+            .scrollDisabled(true)
             .navigationTitle("Subscribers")
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
