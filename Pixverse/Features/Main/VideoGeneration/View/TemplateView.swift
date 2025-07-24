@@ -36,6 +36,9 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
     
     @State private var player: AVPlayer?
     @State private var isPlaying: Bool = false
+    @State private var showControls = true
+    @State private var hideTimer: Timer?
+    @State private var videoEnded = false
     
     @EnvironmentObject private var appCoordinator: AppCoordinator
     @EnvironmentObject private var videoCoordinator: VideoCoordinator
@@ -54,7 +57,6 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
         if let url = item.previewLargeURL {
             VStack(spacing: 24) {
                 videoPlayerView(url: url)
-                    .frame(maxWidth: .infinity)
                     .clipShape(RoundedRectangle(cornerRadius: 30))
                 
                 // Generate button
@@ -116,13 +118,6 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                     }
                 }
             }
-            .onAppear {
-                setupPlayer(url: url)
-            }
-            .onDisappear {
-                player?.pause()
-                player = nil
-            }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Templates")
@@ -145,6 +140,51 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
         }
     }
     
+    @ViewBuilder
+    private func videoPlayerView(url: URL) -> some View {
+        GeometryReader { geometry in
+            let containerWidth = geometry.size.width
+            let containerHeight = geometry.size.height
+            
+            ZStack {
+                if let player = player {
+                    VideoPlayer(player: player)
+                        .disabled(true)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: containerWidth, height: containerHeight)
+                        .clipped()
+                } else {
+                    ProgressView()
+                        .frame(width: containerWidth, height: containerHeight)
+                }
+            }
+            .frame(width: containerWidth, height: containerHeight)
+            .contentShape(Rectangle())
+            .overlay(alignment: .center) {
+                if showControls || videoEnded {
+                    Button(action: togglePlayPause) {
+                        Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                            .foregroundColor(.white)
+                            .font(.system(size: 44))
+                            .padding()
+                    }
+                    .transition(.opacity)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .aspectRatio(9/16, contentMode: .fit)
+        .onTapGesture {
+            handleTap()
+        }
+        .onAppear {
+            setupPlayer(url: url)
+        }
+        .onDisappear {
+            cleanupPlayer()
+        }
+    }
+    
     private func loadImage() {
         guard let templateId = item.templateId else { return }
         
@@ -159,7 +199,6 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                         videoCoordinator.showGenerationProgress(with: image)
                     } else {
                         showAlert = true
-                        print(viewModel.errorMessage)
                     }
                 }
             }
@@ -285,55 +324,76 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
         UIApplication.shared.open(settingsURL)
     }
     
-    @ViewBuilder
-    private func videoPlayerView(url: URL) -> some View {
-        Group {
-            // Video Player
-            if let player = player {
-                VideoPlayer(player: player)
-                    .disabled(true)
-                    .frame(maxWidth: .infinity)
-                    .overlay {
-                        // Play/pause Button
-                        Button(action: togglePlayPause) {
-                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                .foregroundColor(.white)
-                                .font(.system(size: 44))
-                                .padding()
-                        }
-                    }
-            } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.gray.opacity(0.3))
-            }
-        }
-        .background(Color.gray.opacity(0.3))
-    }
-    
-    // MARK: - Player Management
+    // MARK: - Player Setup
     
     private func setupPlayer(url: URL) {
         player = AVPlayer(url: url)
         player?.isMuted = true
+        
+        NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: player?.currentItem,
+            queue: .main
+        ) { _ in
+            videoEnded = true
+            isPlaying = false
+            showControls = true
+            cancelAutoHide()
+        }
+        
+        if isPlaying {
+            player?.play()
+        }
+    }
+    
+    private func cleanupPlayer() {
+        NotificationCenter.default.removeObserver(
+            self,
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: player?.currentItem
+        )
+        player?.pause()
+        player = nil
+        cancelAutoHide()
     }
     
     private func togglePlayPause() {
         guard let player = player else { return }
         
-        let currentItem = player.currentItem
-        if currentItem?.currentTime() == currentItem?.duration {
-            currentItem?.seek(to: .zero, completionHandler: nil)
-            player.pause()
-        }
-        
-        isPlaying.toggle()
-        
-        if isPlaying {
+        if videoEnded {
+            player.seek(to: .zero)
+            videoEnded = false
+            isPlaying = true
             player.play()
         } else {
-            player.pause()
+            isPlaying.toggle()
+            isPlaying ? player.play() : player.pause()
         }
+        
+        showControls = true
+        resetAutoHideTimer()
+    }
+    
+    private func handleTap() {
+        print(#function)
+        showControls = true
+        resetAutoHideTimer()
+    }
+    
+    private func resetAutoHideTimer() {
+        cancelAutoHide()
+        hideTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+            withAnimation {
+                if !videoEnded {
+                    showControls = false
+                }
+            }
+        }
+    }
+    
+    private func cancelAutoHide() {
+        hideTimer?.invalidate()
+        hideTimer = nil
     }
 }
 
