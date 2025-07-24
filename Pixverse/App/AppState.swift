@@ -61,8 +61,8 @@ class AppState: ObservableObject {
     }
     
     func checkSubscriptionStatus() {
-//        self.isPremium = SwiftHelper.apphudHelper.isProUser()
-        self.isPremium = true
+        self.isPremium = SwiftHelper.apphudHelper.isProUser()
+//        self.isPremium = true
     }
     
     func product(for period: SubscriptionModel.PeriodType) -> ApphudProduct? {

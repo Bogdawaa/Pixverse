@@ -29,7 +29,6 @@ struct ContentSectionsView: View {
             }
             
             // if loading
-            // TODO: Change ProgressView style
             if viewModel.isLoading && viewModel.sections.isEmpty {
                 ProgressView()
                     .scaleEffect(1.5)
@@ -58,6 +57,7 @@ struct ContentSectionsView: View {
                 .transition(.opacity)
             }
         }
+        .toolbarBackground(Color.appBackground, for: .navigationBar)
         .background(.appBackground)
     }
 }

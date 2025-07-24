@@ -75,6 +75,13 @@ struct GenerationResult: View {
                 FullscreenVideoPlayer(videoURL: videoUrl, isPlaying: $viewModel.isPlaying)
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Subscribers")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(.white)
+            }
+        }
     }
     
     
@@ -101,13 +108,14 @@ struct GenerationResult: View {
                     }
             } else if viewModel.isLoadingThumbnail {
                 ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(width: 146, height: 168)
                     .background(Color.gray.opacity(0.3))
             } else {
                 Color.gray.opacity(0.3)
                     .overlay(
                         Image(systemName: "photo")
                             .foregroundColor(.white)
+                            .frame(width: 146, height: 168)
                     )
             }
         }

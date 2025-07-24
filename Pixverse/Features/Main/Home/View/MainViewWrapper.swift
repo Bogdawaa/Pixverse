@@ -14,6 +14,7 @@ struct MainViewWrapper: View {
     @EnvironmentObject private var homeCoordinator: HomeCoordinator
     @EnvironmentObject private var videoCoordinator: VideoCoordinator
     
+    
     @StateObject private var contentVM = ContentSectionViewModel()
     @StateObject private var videoVM: VideoViewModel
     @StateObject private var videoGenerationVM = VideoGenerationViewModel()
