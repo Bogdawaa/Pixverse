@@ -60,7 +60,7 @@ struct TextGenerationView: View {
                 
                 // MARK: - Dashed view to upload photo/video
                 if viewModel.shouldShowUploadButton {
-                    DashedView() {
+                    DashedView(cornerRadius: 24) {
                         Button(action: {
                             viewModel.checkPhotoLibraryPermission()
                         }) {
