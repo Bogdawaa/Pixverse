@@ -65,16 +65,48 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
         }
         .animation(.easeInOut, value: viewModel.isGenerationComplete)
         .animation(.easeInOut, value: videoDisplayMode)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Video generation")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(.white)
+            }
+        }
     }
     
     @ViewBuilder
     private var mediaPreview: some View {
-        switch mediaType {
-        case .image(let image):
-            image
-                .resizable()
-        case .video(let url):
-            VideoPlayer(player: AVPlayer(url: url))
+        GeometryReader { geometry in
+            let contentWidth = geometry.size.width
+            let contentHeight = geometry.size.height
+            
+            switch mediaType {
+            case .image(let image):
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: contentWidth, height: contentHeight)
+                    .clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 32))
+            case .video(let url):
+                VideoPlayer(player: AVPlayer(url: url))
+            }
+        }
+        .padding(.vertical, 24)
+        .padding(.horizontal, 78)
+        .overlay {
+            if viewModel.isLoading {
+                ZStack {
+                    Color.appBackground.opacity(0.3)
+                        .clipShape(RoundedRectangle(cornerRadius: 32))
+                        .padding(.vertical, 24)
+                        .padding(.horizontal, 78)
+                    
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .tint(.white)
+                }
+            }
         }
     }
     
@@ -85,22 +117,6 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
             mediaPreview
                 .clipShape(RoundedRectangle(cornerRadius: 32))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
-                .padding(.horizontal, 78)
-                .overlay {
-                    if viewModel.isLoading {
-                        ZStack {
-                            Color.appBackground.opacity(0.3)
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                                .padding(.vertical, 24)
-                                .padding(.horizontal, 78)
-                            
-                            ProgressView()
-                                .scaleEffect(1.5)
-                                .tint(.white)
-                        }
-                    }
-                }
             
             Text("It can take several minutes to create a video. Please don't leave the app")
                 .foregroundStyle(.white)
@@ -209,35 +225,42 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
     // MARK: - Thumbnail
     @ViewBuilder
     private func thumbnailView(url: URL) -> some View {
-        Group {
-            if let thumbnail = videoThumbnail {
-                Image(uiImage: thumbnail)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 146, height: 168)
-                    .overlay {
-                    // Show full screen button
-                    Button(action: {
-                        showFullscreenPlayer = true
-                    }) {
-                        Image(systemName: "play.fill")
-                            .foregroundColor(.white)
-                            .imageScale(.large)
-                            .padding()
+        GeometryReader { geometry in
+            let contentWidth = geometry.size.width
+            let contentHeight = geometry.size.height
+            
+            Group {
+                if let thumbnail = videoThumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: contentWidth, height: contentHeight)
+                        .clipped()
+                        .overlay {
+                        // Show full screen button
+                        Button(action: {
+                            showFullscreenPlayer = true
+                        }) {
+                            Image(systemName: "play.fill")
+                                .foregroundColor(.white)
+                                .imageScale(.large)
+                                .padding()
+                        }
                     }
+                } else if isLoadingThumbnail {
+                    ProgressView()
+                        .frame(width: contentWidth, height: contentHeight)
+                        .background(Color.gray.opacity(0.3))
+                } else {
+                    Color.gray.opacity(0.3)
+                        .overlay(
+                            Image(systemName: "photo")
+                                .foregroundColor(.white)
+                        )
+                        .frame(width: contentWidth, height: contentHeight)
                 }
-            } else if isLoadingThumbnail {
-                ProgressView()
-                    .frame(width: 146, height: 168)
-                    .background(Color.gray.opacity(0.3))
-            } else {
-                Color.gray.opacity(0.3)
-                    .overlay(
-                        Image(systemName: "photo")
-                            .foregroundColor(.white)
-                    )
-                    .frame(width: 146, height: 168)
             }
+            .frame(width: contentWidth, height: contentHeight)
         }
     }
     
@@ -283,6 +306,6 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
 #Preview {
     GenerationProgressView(
         viewModel: VideoGenerationViewModel(),
-        mediaType: .image(Image(.anime))
+        mediaType: .image(Image(.amigurumi))
     )
 }
