@@ -67,7 +67,7 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     
     @Published var activeGenerations: [VideoGeneration] = []
     
-    @Published var isUploadPhotoEnabled = false {
+    @Published var isUploadPhotoEnabled = true {
         didSet {
             if isUploadPhotoEnabled {
                 isUploadVideoEnabled = false
@@ -110,7 +110,9 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     // MARK: - Computed Propertie
     
     var isGenerateButtonDisabled: Bool {
-        guard !prompt.isEmpty else { return true }
+        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return true
+        }
         
         let hasRequiredPhoto = isUploadPhotoEnabled && hasPhoto
         let hasRequiredVideo = isUploadVideoEnabled && hasVideo

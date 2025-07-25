@@ -32,18 +32,18 @@ struct TextGenerationView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                 
                 VStack(spacing: 8) {
-                    if !viewModel.isUploadVideoEnabled {
-                        Toggle("Upload photo", isOn: $viewModel.isUploadPhotoEnabled)
-                            .toggleStyle(.switch)
-                            .tint(.appGreen)
-                            .onChange(of: viewModel.isUploadPhotoEnabled) { enabled in
-                                withAnimation(.easeInOut) {
-                                    if enabled {
-                                        viewModel.isUploadVideoEnabled = false
-                                    }
-                                }
-                            }
-                    }
+//                    if !viewModel.isUploadVideoEnabled {
+//                        Toggle("Upload photo", isOn: $viewModel.isUploadPhotoEnabled)
+//                            .toggleStyle(.switch)
+//                            .tint(.appGreen)
+//                            .onChange(of: viewModel.isUploadPhotoEnabled) { enabled in
+//                                withAnimation(.easeInOut) {
+//                                    if enabled {
+//                                        viewModel.isUploadVideoEnabled = false
+//                                    }
+//                                }
+//                            }
+//                    }
 //                    if !viewModel.isUploadPhotoEnabled {
 //                        Toggle("Upload video", isOn: $viewModel.isUploadVideoEnabled)
 //                            .toggleStyle(.switch)
