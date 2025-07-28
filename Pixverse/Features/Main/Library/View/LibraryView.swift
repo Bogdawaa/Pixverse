@@ -121,7 +121,7 @@ struct LibraryView: View {
         }
         .navigationDestination(
             isPresented: Binding(
-                get: { viewModel.selectedGeneration != nil },
+                get: { viewModel.selectedGeneration != nil && viewModel.selectedGeneration?.videoUrl != nil },
                 set: { if !$0 { viewModel.selectedGeneration = nil } }
             )
         ) {
