@@ -7,47 +7,76 @@
 
 import SwiftUI
 
-class AppCoordinator: ObservableObject {
-    @Published var selectedTab: Int = 0
-    @Published var selectedVideoTab: TemplateTab = .templates
-    @Published var shouldShowSettings = false
+// MARK: - single coordinator
+enum Route: Hashable {
+    case home
+    case video
+    case library
+    case settings
+    case allItems(section: ContentSection)
+    case template(item: AnyContentItem)
+}
+
+enum MediaType: Hashable {
+    case image(Image)
+    case video(URL)
     
-    func navigateToVideoTemplate() {
-        withAnimation {
-            selectedTab = 1
-            selectedVideoTab = .templates
+    static func == (lhs: MediaType, rhs: MediaType) -> Bool {
+        switch (lhs, rhs) {
+        case (.image, .image): return true
+        case (.video, .video): return true
+        default: return false
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .image: hasher.combine(0)
+        case .video: hasher.combine(1)
         }
     }
 }
 
-final class HomeCoordinator: ObservableObject {
+final class Router: ObservableObject {
     @Published var path = NavigationPath()
+    @Published var selectedTab: Int = 0
+    @Published var selectedVideoTab: TemplateTab = .templates
+    @Published var shouldShowSettings = false
+    @Published var selectedImage: UIImage?
     
-    func navigateToVideoTab(with url: URL, appCoordinator: AppCoordinator) {
-        appCoordinator.selectedTab = 1
-        appCoordinator.selectedVideoTab = .templates
+    private var savedPaths: [Int: NavigationPath] = [:]
+    
+    func navigate(to route: Route) {
+        path.append(route)
     }
     
-    func showTemplateTab(for section: ContentSection) {
-        path.append(section)
+    func navigateBack() {
+        path.removeLast()
     }
     
-    func backToRoot() {
+    func popToRoot() {
         path.removeLast(path.count)
     }
     
-    func back() {
-        path.removeLast()
+    func switchTab(to tab: Int) {
+        guard tab != selectedTab else { return }
+        
+        //  cохранить текущий стек навигации
+        savedPaths[selectedTab] = path
+        
+        popToRoot()
+        
+        selectedTab = tab
+        
+        if let savedPath = savedPaths[tab] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.path = savedPath
+            }
+        }
     }
-}
-
-// VideoCoordinator.swift
-final class VideoCoordinator: ObservableObject {
-    @Published var path = NavigationPath()
-    @Published var selectedImage: UIImage?
     
-    func showAllItems(for section: ContentSection) {
-        path.append(section)
+    func navigateToVideoTab() {
+        switchTab(to: 1)
     }
     
     func showVideoDetail(item: any ContentItemProtocol) {
@@ -57,14 +86,6 @@ final class VideoCoordinator: ObservableObject {
     func showGenerationProgress(with image: UIImage) {
         selectedImage = image
         path.append(image)
-    }
-    
-    func backToRoot() {
-        path.removeLast(path.count)
-    }
-    
-    func back() {
-        path.removeLast()
     }
     
     func showGenerationProgress(with media: TextGenerationViewModel.MediaType) {

@@ -31,7 +31,7 @@ final class DefaultNetworkClientImpl: NetworkClient {
             throw NetworkError.invalidURL
         }
         
-        print("🌐 Request URL: \(url.absoluteString)")
+//        print("Request URL: \(url.absoluteString)")
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = request.method.rawValue
@@ -61,7 +61,7 @@ final class DefaultNetworkClientImpl: NetworkClient {
                     throw NetworkError.unauthorized
                 } else {
                     let responseBody = String(data: data, encoding: .utf8) ?? "No body"
-                    print("⚠️ Server error: \(httpResponse.statusCode), Body: \(responseBody)")
+                    print("Server error: \(httpResponse.statusCode), Body: \(responseBody)")
                     throw NetworkError.serverError(code: httpResponse.statusCode)
                 }
             }

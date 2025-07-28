@@ -40,8 +40,7 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
     @State private var hideTimer: Timer?
     @State private var videoEnded = false
     
-    @EnvironmentObject private var appCoordinator: AppCoordinator
-    @EnvironmentObject private var videoCoordinator: VideoCoordinator
+    @EnvironmentObject private var router: Router
     
     let item: any ContentItemProtocol
     
@@ -142,7 +141,10 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                     isShowPaywall = false
                 })
             }
-            
+            .background(.appBackground)
+            .onAppear {
+                router.selectedVideoTab = .templates
+            }
         }
     }
     
@@ -202,7 +204,7 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                 if let vm = viewModel as? VideoGenerationViewModel {
                     await vm.generate(with: .init(templateId: templateId, image: image, videoUrl: nil))
                     if vm.errorMessage == nil {
-                        videoCoordinator.showGenerationProgress(with: image)
+                        router.showGenerationProgress(with: image)
                     } else {
                         showAlert = true
                     }
@@ -236,9 +238,13 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                     await vm.generate(with: .init(templateId: templateId, image: nil, videoUrl: url))
                     if vm.errorMessage == nil {
                         if let thumbnail = thumbnail {
-                            videoCoordinator.showGenerationProgress(with: thumbnail)
+//                            videoCoordinator.showGenerationProgress(with: thumbnail)
+                            router.showGenerationProgress(with: thumbnail)
+
                         } else {
-                            videoCoordinator.showGenerationProgress(with: UIImage(resource: .subject3Fever))
+//                            videoCoordinator.showGenerationProgress(with: UIImage(resource: .subject3Fever))
+                            router.showGenerationProgress(with: UIImage(resource: .subject3Fever))
+
                         }
                     } else {
                         showAlert = true
@@ -261,9 +267,12 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                 }
                 
                 if let thumbnail = thumbnail {
-                    videoCoordinator.showGenerationProgress(with: thumbnail)
+//                    videoCoordinator.showGenerationProgress(with: thumbnail)
+                    router.showGenerationProgress(with: thumbnail)
+
                 } else {
-                    videoCoordinator.showGenerationProgress(with: UIImage(resource: .subject3Fever))
+//                    videoCoordinator.showGenerationProgress(with: UIImage(resource: .subject3Fever))
+                    router.showGenerationProgress(with: UIImage(resource: .subject3Fever))
                 }
                 
                 if let vm = viewModel as? VideoGenerationViewModel {

@@ -18,10 +18,10 @@ struct TextGenerationView: View {
     @State private var showAlert = false
     
     @EnvironmentObject var appState: AppState
-    @EnvironmentObject private var appCoordinator: AppCoordinator
-    @EnvironmentObject private var videoCoordinator: VideoCoordinator
-    @Environment(\.dismiss) var dismiss
+    @EnvironmentObject private var router: Router
     
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ScrollView {
@@ -30,6 +30,15 @@ struct TextGenerationView: View {
                     .frame(minHeight: 130)
                     .background(.appCard2)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .toolbar {
+                        ToolbarItemGroup(placement: .keyboard) {
+                            Spacer()
+                            Button("Done") {
+                                hideKeyboard()
+                            }
+                            .foregroundColor(.blue)
+                        }
+                    }
                 
                 VStack(spacing: 8) {
 //                    if !viewModel.isUploadVideoEnabled {
@@ -109,7 +118,13 @@ struct TextGenerationView: View {
             .foregroundStyle(.white)
             .background(.appCard)
             .clipShape(RoundedRectangle(cornerRadius: 30))
-            
+            .gesture(
+                DragGesture().onEnded { gesture in
+                    if gesture.translation.height > 50 && gesture.predictedEndTranslation.height > 100 {
+                        hideKeyboard()
+                    }
+                }
+            )
             // Generate button
             Button {
                 if let media = viewModel.selectedMedia {
@@ -138,7 +153,7 @@ struct TextGenerationView: View {
                             await viewModel.generate(with: params)
                             print("after \(viewModel.activeGenerations)")
                             if viewModel.errorMessage == nil && viewModel.error == nil {
-                                videoCoordinator.showGenerationProgress(with: media)
+                                router.showGenerationProgress(with: media)
                             } else {
                                 showAlert = true
                             }
@@ -151,11 +166,10 @@ struct TextGenerationView: View {
                 if viewModel.isLoading {
                     HStack {
                         ProgressView()
-                            .tint(.white)
-                        Text("Generate")
+                        Text("Generating")
                             .frame(height: 50)
-                            .frame(maxWidth: .infinity)
                     }
+                    .frame(maxWidth: .infinity)
                 } else {
                     Text("Generate")
                         .frame(height: 50)
@@ -165,6 +179,10 @@ struct TextGenerationView: View {
             .buttonStyle(.primaryButton)
             .disabled(viewModel.isGenerateButtonDisabled)
         }
+        .onTapGesture {
+            hideKeyboard()
+        }
+        
         .alert("Allow access to photos?", isPresented: $viewModel.showPhotoAccessAlert) {
             Button("Allow", role: .none) {
                 openAppSettings()
@@ -195,6 +213,7 @@ struct TextGenerationView: View {
                 isShowPaywall = false
             })
         }
+        
     }
         
     private var templatesFooterView: some View {
@@ -222,7 +241,9 @@ struct TextGenerationView: View {
         UIApplication.shared.open(url)
     }
     
-    
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
 }
 
 #Preview {

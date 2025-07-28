@@ -10,17 +10,17 @@ import AVKit
 
 struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: View {
     
-    enum MediaType {
-        case image(Image)
-        case video(URL)
-    }
+//    enum MediaType {
+//        case image(Image)
+//        case video(URL)
+//    }
     
     enum VideoDisplayMode {
         case preview
         case fullscreen
     }
     
-    @EnvironmentObject var videoCoordinator: VideoCoordinator
+    @EnvironmentObject var router: Router
     
     @State private var videoDisplayMode: VideoDisplayMode = .preview
     @State private var isPlaying = false
@@ -61,6 +61,13 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
             } else {
                 progressView
                     .transition(.opacity)
+            }
+        }
+        .onDisappear {
+            if let vm = viewModel as? TextGenerationViewModel  {
+                if vm.isGenerationComplete {
+                    vm.resetData()
+                }
             }
         }
         .animation(.easeInOut, value: viewModel.isGenerationComplete)
@@ -127,6 +134,9 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
         .padding(.horizontal)
         .padding(.vertical, 96)
         .background(.appBackground)
+        .onAppear {
+            print(viewModel.isLoading)
+        }
     }
     
     
@@ -151,6 +161,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                     switch viewModel.downloadState {
                     case .idle, .failure, .success:
                         Text("Download")
+                            .font(.system(size: 16)).fontWeight(.regular)
                     case .inProgress:
                         HStack {
                             ProgressView()
@@ -188,7 +199,8 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
             title: "Other Templates",
             items: Array(TemplateRepository.shared.getTemplates().prefix(10)),
             onItemSelected: { item in
-                videoCoordinator.showVideoDetail(item: item)
+                router.showVideoDetail(item: item)
+                
             }
         )
         .background(.appCard)

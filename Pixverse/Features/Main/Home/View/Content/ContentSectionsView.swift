@@ -9,7 +9,10 @@ import SwiftUI
 
 struct ContentSectionsView: View {
     
+    @EnvironmentObject private var appState: AppState
     @ObservedObject var viewModel: ContentSectionViewModel
+    
+    var showAll: Bool
     
     var body: some View {
         ZStack {
@@ -21,8 +24,8 @@ struct ContentSectionsView: View {
                 ScrollView(.vertical) {
                     LazyVStack(spacing: 24) {
                         ForEach(viewModel.sections) { section in
-                            MainContentSectionView(viewModel: viewModel, section: section)
-                        }   
+                            MainContentSectionView(viewModel: viewModel, section: section, showAll: showAll)
+                        }
                     }
                     .padding(.vertical, 16)
                 }
@@ -58,6 +61,5 @@ struct ContentSectionsView: View {
             }
         }
         .toolbarBackground(Color.appBackground, for: .navigationBar)
-        .background(.appBackground)
     }
 }

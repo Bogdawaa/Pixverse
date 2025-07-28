@@ -7,6 +7,36 @@
 
 import SwiftUI
 
+enum DownloadState: Equatable {
+    case idle
+    case inProgress
+    case success
+    case failure(Error)
+    
+    static func == (lhs: DownloadState, rhs: DownloadState) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle):
+            return true
+        case (.inProgress, .inProgress):
+            return true
+        case (.success, .success):
+            return true
+        case (.failure, .failure):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
+// MARK: - Download State
+extension DownloadState {
+    var isError: Bool {
+        if case .failure = self { return true }
+        return false
+    }
+}
+
 @MainActor
 final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewModelProtocol {
         
@@ -14,28 +44,6 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
         let templateId: Int
         let image: UIImage?
         let videoUrl: URL?
-    }
-    
-    enum DownloadState: Equatable {
-        case idle
-        case inProgress
-        case success
-        case failure(Error)
-        
-        static func == (lhs: DownloadState, rhs: DownloadState) -> Bool {
-            switch (lhs, rhs) {
-            case (.idle, .idle):
-                return true
-            case (.inProgress, .inProgress):
-                return true
-            case (.success, .success):
-                return true
-            case (.failure, .failure):
-                return true
-            default:
-                return false
-            }
-        }
     }
     
     // MARK: Published
@@ -262,14 +270,6 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
                 }
             }
         }
-    }
-}
-
-// MARK: - Download State
-extension VideoGenerationViewModel.DownloadState {
-    var isError: Bool {
-        if case .failure = self { return true }
-        return false
     }
 }
 
