@@ -26,28 +26,6 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
         case video(URL)
     }
     
-    enum DownloadState: Equatable {
-        case idle
-        case inProgress
-        case success
-        case failure(Error)
-        
-        static func == (lhs: DownloadState, rhs: DownloadState) -> Bool {
-            switch (lhs, rhs) {
-            case (.idle, .idle):
-                return true
-            case (.inProgress, .inProgress):
-                return true
-            case (.success, .success):
-                return true
-            case (.failure, .failure):
-                return true
-            default:
-                return false
-            }
-        }
-    }
-    
     // MARK: - Published Properties
     @Published var selectedImage: UIImage?
     @Published var error: Error?
@@ -55,7 +33,7 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     @Published var selectedItem: PhotosPickerItem?
     @Published var selectedMedia: MediaType?
     @Published var generatedVideoUrl: String?
-    @Published var downloadState: VideoGenerationViewModel.DownloadState = .idle
+    @Published var downloadState: DownloadState = .idle
     @Published var isGenerationComplete: Bool = false
     @Published var showPhotoAccessAlert = false
     @Published var isLoading = false
@@ -213,6 +191,15 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
             // TODO: add textToVideo Generation
             break
         }
+    }
+    
+    func resetData() {
+        errorMessage = nil
+        selectedImage = nil
+        error = nil
+        prompt = ""
+        selectedItem = nil
+        selectedMedia = nil
     }
     
     // MARK: - Private Methods

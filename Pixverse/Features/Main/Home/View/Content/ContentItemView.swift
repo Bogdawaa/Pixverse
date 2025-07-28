@@ -10,9 +10,8 @@ import AVKit
 
 struct ContentItemView: View {
     
-    @EnvironmentObject private var appCoordinator: AppCoordinator
-    @EnvironmentObject private var videoCoordinator: VideoCoordinator
-    
+    @EnvironmentObject private var router: Router
+
     let item: any ContentItemProtocol
     
     @State private var videoThumbnail: UIImage?
@@ -40,10 +39,7 @@ struct ContentItemView: View {
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .contentShape(RoundedRectangle(cornerRadius: 20))
         .onTapGesture {
-            if appCoordinator.selectedTab == 0 {
-                appCoordinator.selectedTab = 1
-            }
-            videoCoordinator.showVideoDetail(item: item)
+            router.showVideoDetail(item: item)
         }
         .onAppear {
             if let videoUrl = item.previewSmallURL {

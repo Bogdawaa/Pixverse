@@ -25,7 +25,7 @@ final class ContentSectionViewModel: ContentSectionViewModelProtocol {
     private let templateService: TemplateServiceProtocol
     
     init(templateService: TemplateServiceProtocol = TemplateService(
-        networkClient: DefaultNetworkClientImpl(baseURL: "https://trust.coreapis.space")
+        networkClient: DefaultNetworkClientImpl(baseURL: Constants.baseURL)
     )) {
         self.templateService = templateService
         
@@ -36,14 +36,12 @@ final class ContentSectionViewModel: ContentSectionViewModelProtocol {
     
     @MainActor
     func fetchTemplates() async {
-        
         guard !isLoading else { return }
-        
         isLoading = true
         error = nil
         
         do {
-            let response = try await templateService.fetchTemplates(appID: "com.test.test")
+            let response = try await templateService.fetchTemplates(appID: Constants.appId)
             try processResponse(response)
             
             self.isLoading = false
@@ -55,7 +53,6 @@ final class ContentSectionViewModel: ContentSectionViewModelProtocol {
     }
     
     func didTapShowAll(for section: ContentSectionType) {
-        print("Show all tapped for \(section.title)")
         selectedSectionForAllItems = section
     }
     

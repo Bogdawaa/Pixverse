@@ -45,12 +45,11 @@ final class VideoViewModel: ObservableObject {
         error = nil
         
         do {
-            let response = try await templateService.fetchTemplates(appID: "com.test.test")
+            let response = try await templateService.fetchTemplates(appID: Constants.appId)
             let templates = response.templates?.map(TemplateItem.init) ?? []
             let styles = response.styles?.map(StyleItem.init) ?? []
             
             TemplateRepository.shared.update(templates: templates, styles: styles)
-            print("Styles in repo: \(TemplateRepository.shared.getStyles().count)")
             
             sections = createSections(from: templates, styles: styles)
             isLoading = false
@@ -100,6 +99,4 @@ final class VideoViewModel: ObservableObject {
             return []
         }
     }
-    
-    
 }

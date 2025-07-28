@@ -44,6 +44,13 @@ struct FullscreenVideoPlayer: View {
                 .transition(.opacity)
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Video generation")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(.white)
+            }
+        }
         .animation(.easeInOut(duration: 0.2), value: showControls)
         .contentShape(RoundedRectangle(cornerRadius: 30))
         .onTapGesture {

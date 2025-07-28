@@ -118,13 +118,13 @@ struct SettingsView: View {
             Spacer()
         }
         .background(Color.appBackground)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("Subscribers")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
-            }
-        }
+//        .toolbar {
+//            ToolbarItem(placement: .principal) {
+//                Text("Subscribers")
+//                    .font(.system(size: 17, weight: .bold))
+//                    .foregroundColor(.white)
+//            }
+//        }
         .safariSheet(url: $viewModel.selectedURL)
         .alert(isPresented: $viewModel.showNotificationPermission) {
             Alert(
@@ -151,6 +151,42 @@ struct SettingsView: View {
     }
 
 }
+
+
+struct SettingsViewWithToolbar: View {
+    
+    @EnvironmentObject private var router: Router
+    
+    var body: some View {
+        NavigationStack {
+            SettingsView()
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            router.shouldShowSettings = false
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 17, weight: .semibold))
+                                Text("Back")
+                            }
+                            .foregroundColor(.appSecondaryText2)
+                        }
+                    }
+                    
+                    ToolbarItem(placement: .principal) {
+                        Text("Subscribers")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                }
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(Color.appBackground, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+        }
+    }
+}
+
 
 #Preview {
     SettingsView()

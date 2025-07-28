@@ -10,7 +10,8 @@ import SwiftUI
 struct LibraryView: View {
     
     
-    @EnvironmentObject var appCoordinator: AppCoordinator
+//    @EnvironmentObject var appCoordinator: AppCoordinator
+    @EnvironmentObject var router: Router
     
     @StateObject private var viewModel: LibraryViewModel = LibraryViewModel()
     
@@ -33,6 +34,7 @@ struct LibraryView: View {
                 } else {
                     generationsView
                 }
+                Spacer()
             }
             .padding()
         }
@@ -71,7 +73,7 @@ struct LibraryView: View {
                 .multilineTextAlignment(.center)
             
             Button {
-                appCoordinator.navigateToVideoTemplate()
+                router.navigateToVideoTab()
             } label: {
                 Text("Video")
                     .frame(maxWidth: .infinity)

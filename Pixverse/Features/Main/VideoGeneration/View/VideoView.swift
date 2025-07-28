@@ -5,8 +5,7 @@ struct VideoView: View {
     @ObservedObject var videoGenerationVM: VideoGenerationViewModel
     @ObservedObject var textGenerationVM: TextGenerationViewModel
     
-    @EnvironmentObject private var videoCoordinator: VideoCoordinator
-    @EnvironmentObject private var appCoordinator: AppCoordinator
+    @EnvironmentObject private var router: Router
     
     var body: some View {
         ZStack {
@@ -15,7 +14,7 @@ struct VideoView: View {
             
             VStack(spacing: 0) {
                 // Segmented Picker
-                CapsuleSegmentedPicker(selection: $appCoordinator.selectedVideoTab) { tab in
+                CapsuleSegmentedPicker(selection: $router.selectedVideoTab) { tab in
                     tab.rawValue
                 }
                 .padding(.vertical, 8)
@@ -23,41 +22,47 @@ struct VideoView: View {
                 
                 // Main Content
                 Group {
-                    switch appCoordinator.selectedVideoTab {
+                    switch router.selectedVideoTab {
                     case .textGeneration:
                         TextGenerationView(viewModel: textGenerationVM)
                             .padding()
-                            .navigationDestination(for: UIImage.self) { image in
-                                GenerationProgressView(viewModel: textGenerationVM, mediaType: .image(Image(uiImage: image)))
-                            }
-                            .navigationDestination(for: URL.self) { url in
-                                GenerationProgressView(viewModel: textGenerationVM, mediaType: .video(url))
+                            .onAppear {
+                                router.selectedVideoTab = .textGeneration
                             }
                     case .styles:
                         contentSectionsView
+                            .onAppear {
+                                router.selectedVideoTab = .styles
+                            }
                     default:
                         contentSectionsView
+                            .onAppear {
+                                router.selectedVideoTab = .templates
+                            }
                     }
                 }
+                
                 Spacer()
             }
         }
-        .background(.appBackground)
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: AnyContentItem.self) { wrappedItem in
-            TemplateView(item: wrappedItem.base, viewModel: videoGenerationVM)
-                .environmentObject(videoCoordinator)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Video generation")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(.white)
+            }
         }
+        .navigationBarTitleDisplayMode(.inline)
+        .tint(.appSecondaryText2)
     }
     
     private var contentSectionsView: some View {
         ScrollView {
             LazyVStack(spacing: 24) {
-                ForEach(viewModel.filteredSections(for: appCoordinator.selectedVideoTab)) { section in
+                ForEach(viewModel.filteredSections(for: router.selectedVideoTab)) { section in
                     let sectionVM = ContentSectionViewModel()
                     
-                    MainContentSectionView(viewModel: sectionVM, section: section)
-                    .padding(.horizontal, 16)
+                    MainContentSectionView(viewModel: sectionVM, section: section, showAll: true)
                 }
             }
             .padding(.top, 16)
@@ -76,5 +81,4 @@ struct VideoView: View {
         videoGenerationVM: VideoGenerationViewModel(),
         textGenerationVM: TextGenerationViewModel()
     )
-        .environmentObject(AppCoordinator())
 }

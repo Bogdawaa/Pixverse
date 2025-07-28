@@ -10,9 +10,6 @@ import AVKit
 
 struct GenerationItemView: View {
     
-    @EnvironmentObject private var appCoordinator: AppCoordinator
-    @EnvironmentObject private var videoCoordinator: VideoCoordinator
-    
     let item: VideoGeneration
     
     @State private var videoThumbnail: UIImage?

@@ -9,13 +9,13 @@ import SwiftUI
 
 struct MainContentSectionView: View {
     
-    @EnvironmentObject private var homeCoordinator: HomeCoordinator
-    @EnvironmentObject private var appCoordinator: AppCoordinator
-    @EnvironmentObject private var videoCoordinator: VideoCoordinator
-
+    @EnvironmentObject private var router: Router
     
     @ObservedObject var viewModel: ContentSectionViewModel
+    
     let section: ContentSection
+    
+    var showAll: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -28,8 +28,17 @@ struct MainContentSectionView: View {
                 
                 if section.showAllButton {
                     Button(action: {
-                        appCoordinator.selectedTab = 1
-                        videoCoordinator.showAllItems(for: section)
+                        if showAll {
+                            router.navigate(to: .allItems(section: section))
+                        } else {
+                            if section.type == ContentSectionType.videoTemplates {
+                                router.navigate(to: .video)
+                                router.selectedVideoTab = .templates
+                            } else {
+                                router.selectedVideoTab = .styles
+                                router.navigate(to: .video)
+                            }
+                        }
                     }) {
                         HStack(spacing: 4) {
                             Text("All")

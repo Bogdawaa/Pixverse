@@ -6,19 +6,19 @@
 //
 
 import SwiftUI
+import Combine
 
 struct MainViewWrapper: View {
     @EnvironmentObject var appState: AppState
-    
-    @EnvironmentObject private var appCoordinator: AppCoordinator
-    @EnvironmentObject private var homeCoordinator: HomeCoordinator
-    @EnvironmentObject private var videoCoordinator: VideoCoordinator
-    
+
+    @EnvironmentObject private var router: Router
     
     @StateObject private var contentVM = ContentSectionViewModel()
     @StateObject private var videoVM: VideoViewModel
     @StateObject private var videoGenerationVM = VideoGenerationViewModel()
     @StateObject private var textGenerationVM = TextGenerationViewModel()
+    
+    @State private var isKeyboardVisible = false
     
     private let templateService: TemplateServiceProtocol
     
@@ -39,126 +39,83 @@ struct MainViewWrapper: View {
     
     var body: some View {
         
-        ZStack {
-            Color.appBackground
-                .ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                // Tab Content
-                TabView(selection: $appCoordinator.selectedTab) {
-                    // Home Tab
-                    NavigationStack(path: $homeCoordinator.path) {
-                        ZStack {
-                            Color.appBackground
-                            
-                            VStack(spacing: 0) {
-                                ContentSectionsView(viewModel: contentVM)
-                                    .environmentObject(appCoordinator)
-                                    .environmentObject(homeCoordinator)
-                                    .environmentObject(videoCoordinator)
-                                    .toolbar {
-                                        ToolbarItem(placement: .topBarLeading) {
-                                                Text("Pixverse Videos")
-                                                    .foregroundStyle(.white)
-                                                    .fontWeight(.bold)
-                                                    .font(.system(size: 34))
-                                                
-                                        }
-                                        // Subscription button
-                                        if !appState.isPremium {
-                                        ToolbarItem(placement: .topBarTrailing) {
-                                                SubscriptionButton()
-                                            }
-                                        }
-                                        ToolbarItem(placement: .topBarTrailing) {
-                                            SettingsButton()
-                                        }
-                                    }
-                            }
-                        }
-                        .navigationDestination(isPresented: $appCoordinator.shouldShowSettings) {
-                            SettingsView()
-                                .environmentObject(appCoordinator)
-                        }
-                    }
-                    .tag(0)
-                    .tint(.appSecondaryText2)
-                    .toolbarColorScheme(.dark, for: .navigationBar)
-                    
-                    // Video Tab
-                    NavigationStack(path: $videoCoordinator.path) {
-                        VideoView(viewModel: videoVM, videoGenerationVM: videoGenerationVM, textGenerationVM: textGenerationVM)
-                            .environmentObject(appCoordinator)
-                            .environmentObject(homeCoordinator)
-                            .environmentObject(videoCoordinator)
-                            .toolbarColorScheme(.dark, for: .navigationBar)
-                            .navigationDestination(for: AnyContentItem.self) { wrappedItem in
-                                TemplateView(item: wrappedItem.base, viewModel: videoGenerationVM)
-                                    .environmentObject(videoCoordinator)
-                            }
-                            .navigationDestination(for: ContentSection.self) { section in
-                                AllItemsView(section: section)
-                            }
-                            .navigationDestination(for: UIImage.self) { image in
-                                GenerationProgressView(viewModel: videoGenerationVM, mediaType: .image(Image(uiImage: image)))
-                            }
-                            .navigationDestination(for: URL.self) { url in
-                                GenerationProgressView(viewModel: videoGenerationVM, mediaType: .video(url))
-                            }
-                    }
-                    .tag(1)
-                    .tint(.appSecondaryText2)
-                    
-                    NavigationStack {
-                        LibraryView()
-                            .toolbar {
-                                ToolbarItem(placement: .topBarLeading) {
-                                    Text("My Library")
-                                        .foregroundStyle(.white)
-                                        .fontWeight(.bold)
-                                        .font(.system(size: 34))
-                                    
-                                }
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    // Subscription button
-                                    if !AppState.shared.isPremium {
-                                        SubscriptionButton()
-                                    }
-                                }
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    SettingsButton()
-                                }
-                            }
-                            .navigationDestination(isPresented: $appCoordinator.shouldShowSettings) {
-                                SettingsView()
-                                    .environmentObject(appCoordinator)
-                                
-                            }
-                    }
-                    .tag(2)
-                    .tint(.appSecondaryText2)
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
+        // Tab Content
+        VStack(spacing: 0) {
+        NavigationStack(path: $router.path) {
+            ZStack {
+                Color.appBackground
+                    .ignoresSafeArea()
                 
-                CapsuleTabBar(selectedTab: $appCoordinator.selectedTab, tabs: tabs)
+                    TabView(selection: $router.selectedTab) {
+                        // MARK: - Home Tab
+                        HomeTabView(contentVM: contentVM)
+                            .tag(0)
+                        
+                        // MARK: - Video Tab
+                        VideoTabView(
+                            videoVM: videoVM,
+                            videoGenerationVM: videoGenerationVM,
+                            textGenerationVM: textGenerationVM
+                        )
+                        .tag(1)
+                        
+                        // MARK: - Library
+                        LibraryTabView()
+                            .tag(2)
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .navigationDestination(for: Route.self) { route in
+                        switch route {
+                        case .video:
+                            VideoView(
+                                viewModel: videoVM,
+                                videoGenerationVM: videoGenerationVM,
+                                textGenerationVM: textGenerationVM
+                            )
+                        case .allItems(let section):
+                            AllItemsView(section: section)
+                        default:
+                            EmptyView()
+                        }
+                    }
+                    .navigationDestination(for: AnyContentItem.self) { wrappedItem in
+                        TemplateView(item: wrappedItem.base, viewModel: videoGenerationVM)
+                    }
+                    .navigationDestination(for: UIImage.self) { image in
+                        if router.selectedVideoTab == .templates {
+                            GenerationProgressView(viewModel: videoGenerationVM, mediaType: .image(Image(uiImage: image)))
+                        } else if router.selectedVideoTab == .textGeneration {
+                            GenerationProgressView(viewModel: textGenerationVM, mediaType: .image(Image(uiImage: image)))
+                        }
+                    }
+                    .navigationDestination(for: URL.self) { url in
+                        GenerationProgressView(viewModel: videoGenerationVM, mediaType: .video(url))
+                    }
+                }
+            }
+            .tint(.appSecondaryText2)
+            .fullScreenCover(isPresented: $router.shouldShowSettings, content: {
+                SettingsViewWithToolbar()
+            })
+            
+            // MARK: - Capsuled tabbar
+            if !isKeyboardVisible {
+                CapsuleTabBar(selectedTab: $router.selectedTab, tabs: tabs)
+                    .transition(.move(edge: .bottom))
             }
         }
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .tint(.appSecondaryText2)
         
-    }
-    
-    private var settingsButton: some View {
-        Button {
-            //
-        } label: {
-            Image(.setting)
-                .tint(.white)
-                .background {
-                    Circle()
-                        .fill(Color.appCard)
-                        .frame(width: 32, height: 32)
-                    
-                }
+        .onChange(of: router.selectedTab) { newTab in
+            if router.selectedTab != newTab {
+                router.popToRoot()
+            }
         }
+        .onReceive(Publishers.keyboardHeight) { height in
+            isKeyboardVisible = height > 0
+        }
+        .animation(.default, value: isKeyboardVisible)
     }
 }
 
@@ -166,7 +123,4 @@ struct MainViewWrapper: View {
 
 #Preview {
     MainViewWrapper()
-        .environmentObject(AppCoordinator())
-        .environmentObject(HomeCoordinator())
-        .environmentObject(VideoCoordinator())
 }

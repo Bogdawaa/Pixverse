@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct SettingsButton: View {
-    @EnvironmentObject private var appCoordinator: AppCoordinator
+    @EnvironmentObject private var router: Router
     
     var body: some View {
         Button {
-            appCoordinator.shouldShowSettings = true
+            router.shouldShowSettings = true
         } label: {
             Image(.setting)
                 .tint(.white)
