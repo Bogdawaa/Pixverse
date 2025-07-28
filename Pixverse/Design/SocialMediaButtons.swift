@@ -22,7 +22,7 @@ struct SocialMediaButton: View {
                     .frame(width: 24, height: 24)
                 
                 Text(label)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 11, weight: .regular))
                     .foregroundStyle(.appSecondaryText2)
             }
             .foregroundColor(.white)
