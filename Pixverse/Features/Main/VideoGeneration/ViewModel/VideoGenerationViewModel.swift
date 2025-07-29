@@ -77,6 +77,16 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
 
     
     // MARK: - Public Methods
+    
+    func resetData() {
+        self.error = nil
+        self.errorMessage = nil
+        self.downloadState = .idle
+        self.generatedVideoUrl = nil
+        self.isGenerationComplete = false
+        self.isLoading = false
+    }
+    
     func generate(with parameters: GenerationParameters) async {
         defer {
             Task {

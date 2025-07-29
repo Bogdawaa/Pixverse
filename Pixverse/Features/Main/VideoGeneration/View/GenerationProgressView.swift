@@ -64,11 +64,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
             }
         }
         .onDisappear {
-            if let vm = viewModel as? TextGenerationViewModel  {
-                if vm.isGenerationComplete {
-                    vm.resetData()
-                }
-            }
+            viewModel.resetData()
         }
         .animation(.easeInOut, value: viewModel.isGenerationComplete)
         .animation(.easeInOut, value: videoDisplayMode)

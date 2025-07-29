@@ -200,6 +200,8 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
         prompt = ""
         selectedItem = nil
         selectedMedia = nil
+        isLoading = false
+        isGenerationComplete = false
     }
     
     // MARK: - Private Methods

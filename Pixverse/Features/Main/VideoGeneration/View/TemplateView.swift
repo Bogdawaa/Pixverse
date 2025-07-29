@@ -238,11 +238,9 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                     await vm.generate(with: .init(templateId: templateId, image: nil, videoUrl: url))
                     if vm.errorMessage == nil {
                         if let thumbnail = thumbnail {
-//                            videoCoordinator.showGenerationProgress(with: thumbnail)
                             router.showGenerationProgress(with: thumbnail)
 
                         } else {
-//                            videoCoordinator.showGenerationProgress(with: UIImage(resource: .subject3Fever))
                             router.showGenerationProgress(with: UIImage(resource: .subject3Fever))
 
                         }
@@ -267,11 +265,9 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                 }
                 
                 if let thumbnail = thumbnail {
-//                    videoCoordinator.showGenerationProgress(with: thumbnail)
                     router.showGenerationProgress(with: thumbnail)
 
                 } else {
-//                    videoCoordinator.showGenerationProgress(with: UIImage(resource: .subject3Fever))
                     router.showGenerationProgress(with: UIImage(resource: .subject3Fever))
                 }
                 

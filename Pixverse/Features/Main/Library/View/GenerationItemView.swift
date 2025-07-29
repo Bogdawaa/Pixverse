@@ -10,7 +10,7 @@ import AVKit
 
 struct GenerationItemView: View {
     
-    let item: VideoGeneration
+    @ObservedObject var generation: VideoGeneration
     
     @State private var videoThumbnail: UIImage?
     @State private var isLoadingThumbnail = false
@@ -18,12 +18,14 @@ struct GenerationItemView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            if let videoURL = item.videoUrl {
-                thumbnailView(url: videoURL)
-            } else if item.status == .generating {
+            if generation.status == .generating {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.gray.opacity(0.3))
+            } else if generation.status == .success {
+                if let videoURL = generation.videoUrl {
+                    thumbnailView(url: videoURL)
+                }
             } else {
                 Image(systemName: "play.slash.fill")
                     .font(.system(size: 24))
@@ -31,14 +33,24 @@ struct GenerationItemView: View {
             }
         }
         .frame(width: 175, height: 225)
-
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .contentShape(RoundedRectangle(cornerRadius: 20))
-        .onAppear {
-            if let videoUrl = item.videoUrl {
-                loadThumbnail(from: videoUrl)
+        .onReceive(generation.$status) { newStatus in
+            if newStatus == .success, let url = generation.videoUrl {
+                loadThumbnail(from: url)
             }
         }
+        .onChange(of: generation.videoUrl) { newUrl in
+            if generation.status == .success, let url = newUrl {
+                loadThumbnail(from: url)
+            }
+        }
+        .task(id: generation.status) {
+            if generation.status == .success, let url = generation.videoUrl {
+                loadThumbnail(from: url)
+            }
+        }
+
     }
     
     // MARK: - Thumbnail
@@ -82,15 +94,16 @@ struct GenerationItemView: View {
     }
     
     private func loadThumbnail(from url: URL) {
-        guard videoThumbnail == nil, !isLoadingThumbnail else { return }
-        
-        isLoadingThumbnail = true
         
         if let cachedImage = ThumbnailCache.shared.get(for: url) {
             videoThumbnail = cachedImage
             isLoadingThumbnail = false
             return
         }
+        
+        guard videoThumbnail == nil, !isLoadingThumbnail else { return }
+        
+        isLoadingThumbnail = true
         
         DispatchQueue.global(qos: .userInitiated).async {
             let asset = AVAsset(url: url)
@@ -117,15 +130,3 @@ struct GenerationItemView: View {
         }
     }
 }
-
-//#Preview {
-//    GenerationItemView(
-//        item: VideoGeneration(
-//            id: <#T##String#>,
-//            generationId: <#T##Int#>,
-//            status: <#T##Status#>,
-//            videoUrl: <#T##URL?#>,
-//            createdAt: <#T##Date#>
-//        )
-//    )
-//}
