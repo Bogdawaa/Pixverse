@@ -20,4 +20,5 @@ protocol GenerationProgressViewModelProtocol: ObservableObject {
     
     func generate(with parameters: GenerationParameters) async
     func downloadVideo() async
+    func resetData()
 }
