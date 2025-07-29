@@ -6,13 +6,31 @@
 //
 
 import Foundation
+import Combine
 
-final class VideoGenerationStorageService {
+final class VideoGenerationStorageService: ObservableObject {
+    
     private let storage: StorageProtocol
     private let key = "video_generations"
+    private let generationsSubject = CurrentValueSubject<[VideoGeneration], Never>([])
+
+    var generationsPublisher: AnyPublisher<[VideoGeneration], Never> {
+        generationsSubject.eraseToAnyPublisher()
+    }
     
     init(storage: StorageProtocol = UserDefaultsStorage()) {
         self.storage = storage
+        loadInitialGenerations()
+    }
+    
+    private func loadInitialGenerations() {
+        do {
+            let generations = try getGenerations()
+            generationsSubject.send(generations)
+        } catch {
+            print("Error loading initial generations: \(error)")
+            generationsSubject.send([])
+        }
     }
     
     func saveGeneration(_ generation: VideoGeneration) throws {
@@ -20,6 +38,7 @@ final class VideoGenerationStorageService {
         generations.removeAll { $0.id == generation.id }
         generations.append(generation)
         try storage.save(generations, forKey: key)
+        generationsSubject.send(generations)
     }
     
     func getGenerations() throws -> [VideoGeneration] {
@@ -31,6 +50,10 @@ final class VideoGenerationStorageService {
         if let index = generations.firstIndex(where: { $0.id == generation.id }) {
             generations[index] = generation
             try storage.save(generations, forKey: key)
+            DispatchQueue.main.async {
+                generation.objectWillChange.send()
+                self.generationsSubject.send(generations)
+            }
         }
     }
     

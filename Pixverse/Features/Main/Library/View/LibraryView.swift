@@ -9,8 +9,6 @@ import SwiftUI
 
 struct LibraryView: View {
     
-    
-//    @EnvironmentObject var appCoordinator: AppCoordinator
     @EnvironmentObject var router: Router
     
     @StateObject private var viewModel: LibraryViewModel = LibraryViewModel()
@@ -21,7 +19,6 @@ struct LibraryView: View {
             GridItem(.fixed(175), spacing: 8)
         ]
     }
-    
     
     var body: some View {
         ZStack {
@@ -94,7 +91,7 @@ struct LibraryView: View {
             ScrollView {
                 if viewModel.generations.count == 1 {
                     HStack(alignment: .top) {
-                        GenerationItemView(item: viewModel.generations[0])
+                        GenerationItemView(generation: viewModel.generations[0])
                             .onTapGesture {
                                 viewModel.selectedGeneration = viewModel.generations[0]
                             }
@@ -105,7 +102,7 @@ struct LibraryView: View {
                 } else {
                     LazyVGrid(columns: gridLayout, spacing: 8) {
                         ForEach(viewModel.generations, id: \.id) { item in
-                            GenerationItemView(item: item)
+                            GenerationItemView(generation: item)
                                 .frame(height: 225)
                                 .onTapGesture {
                                     viewModel.selectedGeneration = item
@@ -118,6 +115,9 @@ struct LibraryView: View {
                 }
             }
             .scrollIndicators(.hidden)
+            .onAppear {
+                viewModel.loadGenerations()
+            }
         }
         .navigationDestination(
             isPresented: Binding(
