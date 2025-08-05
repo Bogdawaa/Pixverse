@@ -29,7 +29,6 @@ class AppState: ObservableObject {
         
         SwiftHelper.apphudHelper.fetchProducts(paywallID: "main") { [weak self] products in
             self?.products = products
-            print("Products: \(products.map(\.productId))")
         }
     }
     
@@ -40,8 +39,6 @@ class AppState: ObservableObject {
                 self?.checkSubscriptionStatus()
             } else {
                 self?.errorMessage = "Failed to restore purchases"
-                print("Not restored")
-
             }
             self?.isLoading = false
             completion(success)
@@ -50,7 +47,6 @@ class AppState: ObservableObject {
     
     func checkSubscriptionStatus() {
         self.isPremium = SwiftHelper.apphudHelper.isProUser()
-        print("isPremium: \(isPremium)")
     }
     
     func getSymbolsAndPrice(for product: ApphudProduct) -> (Double, String) {

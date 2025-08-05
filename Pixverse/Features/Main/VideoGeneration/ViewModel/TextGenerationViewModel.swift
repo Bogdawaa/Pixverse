@@ -79,7 +79,6 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
          storage: VideoGenerationStorageService = VideoGenerationStorageService()
     ) {
         self.styleItems = TemplateRepository.shared.getStyles()
-        print("styles: \(TemplateRepository.shared.getStyles().count)")
         self.templateService = templateService
         self.storage = storage
         loadGenerations()
