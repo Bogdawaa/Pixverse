@@ -102,3 +102,13 @@ extension GenerationResultViewModel.DownloadState {
         return false
     }
 }
+
+extension GenerationResultViewModel: Hashable {
+    static func == (lhs: GenerationResultViewModel, rhs: GenerationResultViewModel) -> Bool {
+        lhs.item.id == rhs.item.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(item.id)
+    }
+}
