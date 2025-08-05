@@ -13,6 +13,9 @@
   "nonRenewingSubscriptions" : [
 
   ],
+  "products" : [
+
+  ],
   "settings" : {
     "_failTransactionsEnabled" : false,
     "_locale" : "en_US",
@@ -24,7 +27,10 @@
         "name" : "Load Products"
       },
       {
-        "current" : null,
+        "current" : {
+          "index" : 1,
+          "type" : "purchase"
+        },
         "enabled" : false,
         "name" : "Purchase"
       },
@@ -67,8 +73,9 @@
   },
   "simulatedTransactions" : [
     {
-      "productIdentifier" : "week_4.99_nottrial",
-      "transactionState" : "Purchased"
+      "productIdentifier" : "year_39.99_nottrial",
+      "transactionState" : "Purchased",
+      "originalPurchaseDate": "2025-08-03T00:00:00Z"
     }
   ],
   "subscriptionGroups" : [

@@ -11,7 +11,6 @@ struct SubscriptionSingleView: View {
     let title: String
     let price: String
     let frequency: String
-//    let fullPrice: String
     let isSelected: Bool
     let hasDiscount: Bool
     
@@ -59,7 +58,6 @@ struct SubscriptionSingleView: View {
         title: "Year",
         price: "80",
         frequency: "awawd",
-//        fullPrice: "awdw",
         isSelected: true,
         hasDiscount: true
     )

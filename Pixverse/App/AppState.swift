@@ -27,48 +27,30 @@ class AppState: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        Task {
-            let fetchedProducts = try await Apphud.fetchProducts()
-            fetchedProducts.forEach { product in
-                if let product = (Apphud.apphudProductFor(product)) {
-                    products.append(product)
-                }
-            }
+        SwiftHelper.apphudHelper.fetchProducts(paywallID: "main") { [weak self] products in
+            self?.products = products
+            print("Products: \(products.map(\.productId))")
         }
     }
     
-    func purchase(product: ApphudProduct) {
-        isLoading = true
-        SwiftHelper.apphudHelper.purchaseSubscription(subscription: product) { [weak self] success in
-            self?.isLoading = false
-            if success {
-                self?.checkSubscriptionStatus()
-            } else {
-                print("Failed to purchase subscription")
-                self?.errorMessage = "Failed to purchase subscription"
-            }
-        }
-    }
-    
-    func restorePurchases() {
+    func restorePurchases(completion: @escaping (Bool) -> Void) {
         isLoading = true
         SwiftHelper.apphudHelper.restoreAllProducts { [weak self] success in
-            self?.isLoading = false
             if success {
                 self?.checkSubscriptionStatus()
             } else {
                 self?.errorMessage = "Failed to restore purchases"
+                print("Not restored")
+
             }
+            self?.isLoading = false
+            completion(success)
         }
     }
     
     func checkSubscriptionStatus() {
-//        self.isPremium = SwiftHelper.apphudHelper.isProUser()
-        self.isPremium = Apphud.hasActiveSubscription() // TODO: uncomment
-    }
-
-    func product(for id: String) -> ApphudProduct? {
-        return products.first(where: { $0.productId == id })
+        self.isPremium = SwiftHelper.apphudHelper.isProUser()
+        print("isPremium: \(isPremium)")
     }
     
     func getSymbolsAndPrice(for product: ApphudProduct) -> (Double, String) {
@@ -77,5 +59,18 @@ class AppState: ObservableObject {
     
     func getSubscriptionUnit(for product: ApphudProduct) -> String? {
         return SwiftHelper.apphudHelper.returnSubscriptionUnit(product: product)
+    }
+    
+    func purchase(product: ApphudProduct, completion: @escaping (Bool) -> Void) {
+        isLoading = true
+        
+        SwiftHelper.apphudHelper.purchaseSubscription(subscription: product) { [weak self] success in
+            self?.isLoading = false
+            if success {
+                self?.checkSubscriptionStatus()
+            }
+            self?.isLoading = false
+            completion(success)
+        }
     }
 }

@@ -15,6 +15,7 @@ struct PixverseApp: App {
     @StateObject private var appState = AppState.shared
     
     init() {
+//        Apphud.enableDebugLogs()
         Apphud.start(apiKey: "app_3csKXeauyMzT1PcMyDezXu8D112SW4")
     }
     
@@ -24,6 +25,7 @@ struct PixverseApp: App {
                 .environmentObject(appState)
                 .onAppear {
                     appState.checkSubscriptionStatus()
+                    appState.fetchProducts()
                 }
         }
     }
