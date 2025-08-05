@@ -42,6 +42,7 @@ final class Router: ObservableObject {
     @Published var selectedTab: Int = 0
     @Published var selectedVideoTab: TemplateTab = .templates
     @Published var shouldShowSettings = false
+    @Published var shouldShowPaywall = false
     @Published var selectedImage: UIImage?
     
     private var savedPaths: [Int: NavigationPath] = [:]

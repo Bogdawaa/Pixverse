@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct SubscriptionButton: View {
+    
+    @EnvironmentObject private var router: Router
+    
     var body: some View {
         Button {
-            //
+            router.shouldShowPaywall = true
         } label: {
             Image(systemName: "sparkles")
                 .symbolRenderingMode(.monochrome)

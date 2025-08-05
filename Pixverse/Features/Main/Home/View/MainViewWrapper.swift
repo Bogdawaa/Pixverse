@@ -100,7 +100,11 @@ struct MainViewWrapper: View {
             .fullScreenCover(isPresented: $router.shouldShowSettings, content: {
                 SettingsViewWithToolbar()
             })
-            
+            .fullScreenCover(isPresented: $router.shouldShowPaywall, content: {
+                PaywallView(onDismiss: {
+                    router.shouldShowPaywall = false
+                })
+            })
             // MARK: - Capsuled tabbar
             if !isKeyboardVisible {
                 CapsuleTabBar(selectedTab: $router.selectedTab, tabs: tabs)
