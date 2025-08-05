@@ -49,6 +49,11 @@ playground.xcworkspace
 
 .build/
 
+## App-specific secrets
+*.p12
+*.cer
+*.mobileprovision
+
 # CocoaPods
 #
 # We recommend against adding the Pods directory to your .gitignore. However
@@ -87,15 +92,3 @@ fastlane/test_output
 #
 # After new code Injection tools there's a generated folder /iOSInjectionProject
 # https://github.com/johnno1962/injectionforxcode
-
-iOSInjectionProject/
-RuGuide-MVPLight/Routes Screen/.DS_Store
-RuGuide-MVPLight/.DS_Store
-.DS_Store
-*.lock
-Package.swift
-Package.resolved
-RuGuide-MVPLight/Supporting Files/GoogleService-Info.plist
-RuGuide-MVPLight.xcodeproj/xcuserdata
-RuGuide-MVPLight.xcodeproj/xcuserdata/aumetov.xcuserdatad/xcschemes/xcschememanagement.plist
-RuGuide-MVPLight.xcodeproj/xcuserdata/kirillkarpovich.xcuserdatad/xcschemes/xcschememanagement.plist

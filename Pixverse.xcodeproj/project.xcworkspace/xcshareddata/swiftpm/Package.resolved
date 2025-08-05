@@ -1,0 +1,33 @@
+{
+  "originHash" : "223c89229a3cf82a2be419bf7d273bb74e7352293b31c6b362e2419770c02d16",
+  "pins" : [
+    {
+      "identity" : "apphudsdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apphud/ApphudSDK",
+      "state" : {
+        "revision" : "a4d2b93384cc67fa6a853465ff345be6f84b0a72",
+        "version" : "3.6.2"
+      }
+    },
+    {
+      "identity" : "snapkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SnapKit/SnapKit.git",
+      "state" : {
+        "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
+        "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "swifthelper",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Vladimir089/SwiftHelper",
+      "state" : {
+        "revision" : "ad94b5aa2d6ced4b34da1da8bbb2a3ef8ef2676b",
+        "version" : "0.1.2"
+      }
+    }
+  ],
+  "version" : 3
+}
