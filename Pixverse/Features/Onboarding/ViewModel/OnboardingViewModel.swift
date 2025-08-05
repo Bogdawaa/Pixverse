@@ -41,17 +41,22 @@ final class OnboardingViewModel {
     
     // MARK: - Private Methods
     private func requestAppReview() {
-//        #if DEBUG
+        #if DEBUG
         debugPrint("Debug mode - showing notifications request")
         showNotificationsRequestScreen = true
-//        #else
+        #else
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             SKStoreReviewController.requestReview(in: windowScene)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.showNotificationsRequestScreen = true
         }
-//        #endif
+        #endif
+    }
+    
+    func openAppStoreForRating() {
+        guard let url = URL(string: "https://apps.apple.com/app/\(Constants.appStoreAppId)?action=write-review") else { return }
+        UIApplication.shared.open(url)
     }
 }
 
