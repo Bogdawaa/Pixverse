@@ -240,7 +240,7 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
         do {
             // Start generation
             let response = try await templateService.generateImageToVideo(
-                userId: Constants.userId,
+                userId: AppState.shared.userId,
                 appId: Constants.appId,
                 prompt: prompt,
                 imageData: imageData

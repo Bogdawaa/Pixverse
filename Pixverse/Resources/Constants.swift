@@ -8,8 +8,7 @@
 import Foundation
 
 struct Constants {
-    static var appId: String = "com.test.test"
-    static var userId: String = "test"
+    static var appId: String = "com.rajab.pix"
     static var baseURL: String = "https://trust.coreapis.space"
     static var supportEmail: String = "rajabsalaahalsani@outlook.com"
     
