@@ -91,6 +91,9 @@ struct MainViewWrapper: View {
                     .navigationDestination(for: URL.self) { url in
                         GenerationProgressView(viewModel: videoGenerationVM, mediaType: .video(url))
                     }
+                    .navigationDestination(for: GenerationResultViewModel.self) { vm in
+                        GenerationResult(viewModel: vm)
+                    }
                 }
             }
             .tint(.appSecondaryText2)

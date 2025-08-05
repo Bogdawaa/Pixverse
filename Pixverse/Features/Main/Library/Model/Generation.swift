@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class VideoGeneration: ObservableObject, Identifiable, Codable {
+final class VideoGeneration: ObservableObject, Identifiable, Codable, Equatable {
     let id: String
     let generationId: Int
     @Published var status: Status
@@ -54,5 +54,13 @@ final class VideoGeneration: ObservableObject, Identifiable, Codable {
         try container.encode(status, forKey: .status)
         try container.encodeIfPresent(videoUrl, forKey: .videoUrl)
         try container.encode(createdAt, forKey: .createdAt)
+    }
+    
+    static func == (lhs: VideoGeneration, rhs: VideoGeneration) -> Bool {
+        return lhs.id == rhs.id &&
+        lhs.generationId == rhs.generationId &&
+        lhs.status == rhs.status &&
+        lhs.videoUrl == rhs.videoUrl &&
+        lhs.createdAt == rhs.createdAt
     }
 }

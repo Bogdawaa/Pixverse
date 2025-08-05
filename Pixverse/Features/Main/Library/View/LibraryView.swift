@@ -119,15 +119,15 @@ struct LibraryView: View {
                 viewModel.loadGenerations()
             }
         }
-        .navigationDestination(
-            isPresented: Binding(
-                get: { viewModel.selectedGeneration != nil && viewModel.selectedGeneration?.videoUrl != nil },
-                set: { if !$0 { viewModel.selectedGeneration = nil } }
-            )
-        ) {
-            if let generation = viewModel.selectedGeneration, let _ = generation.videoUrl {
+        .onChange(of: viewModel.selectedGeneration) { generation in
+            if let generation = generation, generation.videoUrl != nil {
                 let vm = GenerationResultViewModel(item: generation)
-                GenerationResult(viewModel: vm)
+                router.path.append(vm)
+            }
+        }
+        .onChange(of: router.selectedTab) { newTab in
+            if newTab != 2 {
+                viewModel.selectedGeneration = nil
             }
         }
     }
