@@ -23,15 +23,19 @@ class AppState: ObservableObject {
     
     @Published var userId: String = Apphud.userID()
     
-    func fetchProducts(paywallID: String) {
+    func fetchProducts() {
         isLoading = true
+        defer { isLoading = false }
         
-        SwiftHelper.apphudHelper.fetchProducts(paywallID: paywallID) { [weak self] products in
-            self?.products = products
-            self?.isLoading = false
+        Task {
+            let fetchedProducts = try await Apphud.fetchProducts()
+            fetchedProducts.forEach { product in
+                if let product = (Apphud.apphudProductFor(product)) {
+                    products.append(product)
+                }
+            }
         }
     }
-    
     
     func purchase(product: ApphudProduct) {
         isLoading = true
@@ -60,18 +64,18 @@ class AppState: ObservableObject {
     
     func checkSubscriptionStatus() {
 //        self.isPremium = SwiftHelper.apphudHelper.isProUser()
-//        self.isPremium = true
+        self.isPremium = Apphud.hasActiveSubscription() // TODO: uncomment
+    }
+
+    func product(for id: String) -> ApphudProduct? {
+        return products.first(where: { $0.productId == id })
     }
     
-    func product(for period: SubscriptionModel.PeriodType) -> ApphudProduct? {
-        let productId: String
-        
-        switch period {
-        case .week: productId = "weekly_product_id"
-        case .month: productId = "monthly_product_id"
-        case .year: productId = "yearly_product_id"
-        }
-        
-        return products.first(where: { $0.productId == productId })
+    func getSymbolsAndPrice(for product: ApphudProduct) -> (Double, String) {
+        return SwiftHelper.apphudHelper.returnClearPriceAndSymbol(product: product)
+    }
+    
+    func getSubscriptionUnit(for product: ApphudProduct) -> String? {
+        return SwiftHelper.apphudHelper.returnSubscriptionUnit(product: product)
     }
 }

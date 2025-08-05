@@ -15,7 +15,7 @@ struct PixverseApp: App {
     @StateObject private var appState = AppState.shared
     
     init() {
-        Apphud.start(apiKey: "app_wUSLSxe9t1nJzbJVVr1H3fvBV4r7ro")
+        Apphud.start(apiKey: "app_3csKXeauyMzT1PcMyDezXu8D112SW4")
     }
     
     var body: some Scene {

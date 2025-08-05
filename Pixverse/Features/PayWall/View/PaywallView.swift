@@ -58,7 +58,7 @@ struct PaywallView: View {
         .onAppear {
             viewModel.showCloseButtonAfterDelay()
             if appState.products.isEmpty {
-                appState.fetchProducts(paywallID: "PixverseID")
+                appState.fetchProducts()
             }
         }
         .onDisappear { viewModel.showCloseButton = false }
@@ -110,17 +110,16 @@ struct PaywallView: View {
     
     private var subscriptionOptions: some View {
         VStack(spacing: 16) {
-            ForEach(viewModel.subscriptionOptions) { option in
+            ForEach(viewModel.subscriptionOptions, id: \.productId) { product in
                 SubscriptionSingleView(
-                    title: option.period.rawValue,
-                    price: option.formattedPrice,
-                    frequency: option.frequencyText,
-                    fullPrice: option.formattedFullPrice,
-                    isSelected: viewModel.selectedOption == option.period,
-                    discount: option.discount
+                    title: product.name ?? "Unknown name",
+                    price: "\(appState.getSymbolsAndPrice(for: product).0)\(appState.getSymbolsAndPrice(for: product).1)",
+                    frequency: appState.getSubscriptionUnit(for: product) ?? "Unknown period",
+                    isSelected: viewModel.selectedProduct?.productId == product.productId,
+                    hasDiscount: product.productId == viewModel.subscriptionOptions.first?.productId ? true : false
                 )
                 .onTapGesture {
-                    viewModel.selectOption(option.period)
+                    viewModel.selectProduct(product)
                 }
             }
         }
@@ -133,6 +132,7 @@ struct PaywallView: View {
             Label("Cancel Anytime",
                   systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90"
             )
+            .font(.system(size: 12))
             .frame(minHeight: 40)
             .frame(maxWidth: .infinity)
         }
@@ -142,8 +142,8 @@ struct PaywallView: View {
     // Continue Button
     private var continueButton: some View {
         Button {
-            guard let product = appState.product(for: viewModel.selectedOption) else {
-                appState.errorMessage = "Product not available"
+            guard let product = viewModel.selectedProduct else {
+                appState.errorMessage = "Please select a subscription option"
                 return
             }
             appState.purchase(product: product)
@@ -153,7 +153,7 @@ struct PaywallView: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.primaryButton)
-        .disabled(appState.isLoading)
+        .disabled(appState.isLoading || viewModel.selectedProduct == nil)
     }
     
     private var legalLinksButtons: some View {

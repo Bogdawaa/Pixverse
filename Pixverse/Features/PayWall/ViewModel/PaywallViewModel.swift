@@ -6,13 +6,20 @@
 //
 
 import SwiftUI
+import ApphudSDK
 
+@MainActor
 final class PaywallViewModel: ObservableObject {
     @Published var selectedOption: SubscriptionModel.PeriodType = .year
     @Published var showCloseButton = false
     @Published var selectedURL: AppURL?
     
+    let appState = AppState.shared
+    
     let closeButtonAppearingDelay: TimeInterval = 2.0
+    
+    @Published var selectedProduct: ApphudProduct?
+    
     
     struct Feature {
         let title: String
@@ -25,10 +32,18 @@ final class PaywallViewModel: ObservableObject {
         Feature(title: "Lack of advertising", icon: "sparkles")
     ]
     
-    let subscriptionOptions = SubscriptionModel.mock
+//    let subscriptionOptions = SubscriptionModel.mock
+    
+    var subscriptionOptions: [ApphudProduct] {
+            appState.products
+    }
     
     func selectOption(_ period: SubscriptionModel.PeriodType) {
         selectedOption = period
+    }
+    
+    func selectProduct(_ product: ApphudProduct) {
+        selectedProduct = product
     }
     
     func showCloseButtonAfterDelay() {
@@ -39,11 +54,13 @@ final class PaywallViewModel: ObservableObject {
         }
     }
     
-    func productId(for period: SubscriptionModel.PeriodType) -> String {
-        switch period {
-        case .week: return "weekly_product_id"
-        case .month: return "monthly_product_id"
-        case .year: return "yearly_product_id"
-        }
-    }
+//    func productId(for period: SubscriptionModel.PeriodType) -> String {
+//        switch period {
+//        case .week: return "weekly_product_id"
+//        case .month: return "monthly_product_id"
+//        case .year: return "yearly_product_id"
+//        }
+//    }
+    
+    
 }

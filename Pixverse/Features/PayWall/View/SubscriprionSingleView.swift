@@ -11,26 +11,19 @@ struct SubscriptionSingleView: View {
     let title: String
     let price: String
     let frequency: String
-    let fullPrice: String
+//    let fullPrice: String
     let isSelected: Bool
-    let discount: Int?
+    let hasDiscount: Bool
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            // Title with attributed price
-            AttributedTextView(
-                text: "\(title) \(price)\(frequency)",
-                boldParts: [title, price],
-                boldFont: .body.bold(),
-                regularFont: .body,
-                color: .white
-            )
-            
-            // Full price
-            Text(fullPrice)
-                .font(.footnote)
-                .foregroundColor(.gray)
-        }
+        // Title with attributed price
+        AttributedTextView(
+            text: "\(price)/ \(frequency)",
+            boldParts: [price],
+            boldFont: .body.bold(),
+            regularFont: .body,
+            color: .white
+        )
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -41,8 +34,8 @@ struct SubscriptionSingleView: View {
         .contentShape(Capsule())
         .overlay(alignment: .topTrailing) {
             // MARK: - Sale badge
-            if let discount = discount {
-                Text("SAVE \(discount)%")
+            if hasDiscount {
+                Text("SAVE \(80)%")
                     .font(.caption2.bold())
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
@@ -66,8 +59,8 @@ struct SubscriptionSingleView: View {
         title: "Year",
         price: "80",
         frequency: "awawd",
-        fullPrice: "awdw",
+//        fullPrice: "awdw",
         isSelected: true,
-        discount: 80
+        hasDiscount: true
     )
 }
