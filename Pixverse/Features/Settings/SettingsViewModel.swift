@@ -83,7 +83,7 @@ final class SettingsViewModel: ObservableObject {
     }
     
     func getEmailURL() -> URL? {
-        let recipient = "support@pixverse.com"
+        let recipient = Constants.supportEmail
         let subject = "Pixverse Support"
         let body = """
             User ID: \(Apphud.userID())

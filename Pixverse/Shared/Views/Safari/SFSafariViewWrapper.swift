@@ -9,9 +9,8 @@ import SwiftUI
 import SafariServices
 
 enum AppURL: String, Identifiable {
-    case privacy = "https://exampleapi.com/privacy"
-    case terms = "https://exampleapi.com/terms"
-    case contact = "https://exampleapi.com/contact"
+    case privacy = "https://docs.google.com/document/d/1JvO3C-4M-OrKST22rshQ4wmmgTODLjXcTqHdaKXlCkM/edit?tab=t.0"
+    case terms = "https://docs.google.com/document/d/1Flw2PbLZzorHJyhW6Ljvcpsm6PCKKcQXpJo9P9Pb81I/edit?tab=t.0"
     
     var id: String { rawValue }
     

@@ -141,7 +141,7 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
         do {
             // Start generation
             let response = try await templateService.generateTemplateVideo(
-                userId: Constants.userId,
+                userId: AppState.shared.userId,
                 appId: Constants.appId,
                 templateId: templateId,
                 imageData: imageData
@@ -187,7 +187,7 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
             
             // Start generation
             let response = try await templateService.generateVideoToVideo(
-                userId: Constants.userId,
+                userId: AppState.shared.userId,
                 appId: Constants.appId,
                 templateId: templateId,
                 videoData: videoData

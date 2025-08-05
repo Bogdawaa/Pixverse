@@ -12,12 +12,10 @@ struct PaywallView: View {
     // MARK: - ENvironment
     @Environment(\.dismiss) var dismiss
     
-    @EnvironmentObject var appState: AppState
+    var appState = AppState.shared
     
     // MARK: - States
     @StateObject private var viewModel = PaywallViewModel()
-    
-    @State private var showAlert = false
     
     // MARK: - Properties
     private let closeButtonAppearingDelay: TimeInterval = 2.0
@@ -58,19 +56,31 @@ struct PaywallView: View {
         .onAppear {
             viewModel.showCloseButtonAfterDelay()
             if appState.products.isEmpty {
-                appState.fetchProducts(paywallID: "PixverseID")
+                appState.fetchProducts()
             }
         }
         .onDisappear { viewModel.showCloseButton = false }
-        .alert(isPresented: $showAlert) {
+        .alert(isPresented: $viewModel.showErrorAlert) {
             Alert(
                 title: Text("Error"),
-                message: Text(appState.errorMessage ?? "Unknown error"),
-                dismissButton: .default(Text("OK"))
+                message: Text(viewModel.purchaseErrorMessage ?? "Please try again later."),
+                dismissButton: .default(Text("OK")) {
+                    viewModel.purchaseErrorMessage = nil
+                }
             )
         }
-        .onChange(of: appState.errorMessage) { newValue in
-            showAlert = newValue != nil
+        .onChange(of: viewModel.purchaseErrorMessage) { newValue in
+            viewModel.showErrorAlert = newValue != nil
+        }
+        .alert(isPresented: $viewModel.showSuccessAlert) {
+            Alert(
+                title: Text("Success"),
+                message: Text("Subscriptions restored!"),
+                dismissButton: .default(Text("OK")) {
+                    dismiss()
+                    onDismiss()
+                }
+            )
         }
     }
     
@@ -94,7 +104,7 @@ struct PaywallView: View {
             }
             .overlay(alignment: .top) {
                 ProBadgeView( action: {
-                    // PRO button onTap action
+                    // PRO button onTap action?
                 })
             }
             .overlay(alignment: .topTrailing) {
@@ -110,17 +120,17 @@ struct PaywallView: View {
     
     private var subscriptionOptions: some View {
         VStack(spacing: 16) {
-            ForEach(viewModel.subscriptionOptions) { option in
+            ForEach(viewModel.subscriptionOptions, id: \.productId) { product in
                 SubscriptionSingleView(
-                    title: option.period.rawValue,
-                    price: option.formattedPrice,
-                    frequency: option.frequencyText,
-                    fullPrice: option.formattedFullPrice,
-                    isSelected: viewModel.selectedOption == option.period,
-                    discount: option.discount
+                    title: product.name ?? "Unknown name",
+                    price: "\(appState.getSymbolsAndPrice(for: product).0)\(appState.getSymbolsAndPrice(for: product).1)",
+                    frequency: appState.getSubscriptionUnit(for: product) ?? "Unknown period",
+                    isSelected: viewModel.selectedProduct?.productId == product.productId,
+                    hasDiscount: product.productId == viewModel.subscriptionOptions.first?.productId ? true : false
                 )
                 .onTapGesture {
-                    viewModel.selectOption(option.period)
+                    viewModel.selectProduct(product)
+                    print("Selected: \(viewModel.selectedProduct?.productId ?? "No product selected")")
                 }
             }
         }
@@ -133,6 +143,7 @@ struct PaywallView: View {
             Label("Cancel Anytime",
                   systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90"
             )
+            .font(.system(size: 12))
             .frame(minHeight: 40)
             .frame(maxWidth: .infinity)
         }
@@ -142,18 +153,20 @@ struct PaywallView: View {
     // Continue Button
     private var continueButton: some View {
         Button {
-            guard let product = appState.product(for: viewModel.selectedOption) else {
-                appState.errorMessage = "Product not available"
-                return
+            guard let product = viewModel.selectedProduct else { return }
+            Task {
+                if await viewModel.purchaseProduct(product: product) {
+                    dismiss()
+                    onDismiss()
+                }
             }
-            appState.purchase(product: product)
         } label: {
             Text("Continue")
                 .frame(height: 50)
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.primaryButton)
-        .disabled(appState.isLoading)
+        .disabled(appState.isLoading || viewModel.selectedProduct == nil)
     }
     
     private var legalLinksButtons: some View {
@@ -164,7 +177,9 @@ struct PaywallView: View {
                 }
                 Spacer()
                 Button(action: {
-                    appState.restorePurchases()
+                    Task {
+                        await viewModel.restorePurchase()
+                    }
                 }, label: {
                     Text("Restore Purcahses")
                         .foregroundStyle(.white.opacity(0.6))

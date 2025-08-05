@@ -16,7 +16,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		F09DA42F2E26C6DC00CA0465 /* Exceptions for "Pixverse" folder in "Pixverse" target */ = {
+		F05F906C2E3B9E8F006B8378 /* Exceptions for "Pixverse" folder in "Pixverse" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -26,10 +26,10 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		F0E5087C2E1D1D8E0028855C /* Pixverse */ = {
+		F05F90092E3B9E8F006B8378 /* Pixverse */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				F09DA42F2E26C6DC00CA0465 /* Exceptions for "Pixverse" folder in "Pixverse" target */,
+				F05F906C2E3B9E8F006B8378 /* Exceptions for "Pixverse" folder in "Pixverse" target */,
 			);
 			path = Pixverse;
 			sourceTree = "<group>";
@@ -52,7 +52,7 @@
 		F0E508712E1D1D8E0028855C = {
 			isa = PBXGroup;
 			children = (
-				F0E5087C2E1D1D8E0028855C /* Pixverse */,
+				F05F90092E3B9E8F006B8378 /* Pixverse */,
 				F0E5087B2E1D1D8E0028855C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -81,7 +81,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				F0E5087C2E1D1D8E0028855C /* Pixverse */,
+				F05F90092E3B9E8F006B8378 /* Pixverse */,
 			);
 			name = Pixverse;
 			packageProductDependencies = (
@@ -276,9 +276,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3SG3MUV83U;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = B7WB4GA38U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Pixverse/Info.plist;
@@ -299,9 +301,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ru.BogdanFartdninov.Pixverse;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rajab.pix;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = provision;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -317,9 +320,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3SG3MUV83U;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = B7WB4GA38U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Pixverse/Info.plist;
@@ -340,9 +345,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ru.BogdanFartdninov.Pixverse;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rajab.pix;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = provision;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;

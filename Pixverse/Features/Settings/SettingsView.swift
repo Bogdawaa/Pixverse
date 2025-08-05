@@ -49,7 +49,7 @@ struct SettingsView: View {
                             .labelsHidden()
                             .tint(.appGreen)
                     }
-                    
+                    #if DEBUG
                     HStack {
                         // переключатель для тестирования
                         Text("Is Premium User")
@@ -59,6 +59,7 @@ struct SettingsView: View {
                             .labelsHidden()
                             .tint(.appGreen)
                     }
+                    #endif
                 }
                 .listRowBackground(Color.appBackground)
                 
@@ -118,13 +119,6 @@ struct SettingsView: View {
             Spacer()
         }
         .background(Color.appBackground)
-//        .toolbar {
-//            ToolbarItem(placement: .principal) {
-//                Text("Subscribers")
-//                    .font(.system(size: 17, weight: .bold))
-//                    .foregroundColor(.white)
-//            }
-//        }
         .safariSheet(url: $viewModel.selectedURL)
         .alert(isPresented: $viewModel.showNotificationPermission) {
             Alert(

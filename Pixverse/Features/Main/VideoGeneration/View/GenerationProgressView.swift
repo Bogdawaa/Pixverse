@@ -44,6 +44,9 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                     Spacer()
                     templatesFooterView
                 }
+                .onDisappear {
+                    viewModel.resetData()
+                }
                 .transition(.opacity)
                 .navigationDestination(isPresented: $showFullscreenPlayer) {
                     if let videoUrl = viewModel.generatedVideoUrl, let url = URL(string: videoUrl) {
@@ -62,9 +65,6 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                 progressView
                     .transition(.opacity)
             }
-        }
-        .onDisappear {
-            viewModel.resetData()
         }
         .animation(.easeInOut, value: viewModel.isGenerationComplete)
         .animation(.easeInOut, value: videoDisplayMode)
