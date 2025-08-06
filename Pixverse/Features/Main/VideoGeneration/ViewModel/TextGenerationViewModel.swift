@@ -326,6 +326,7 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
                     showAlert = true
                     self.error = error
                     isLoading = false
+                    generationManager.endGeneration()
                     break
                 }
             }
