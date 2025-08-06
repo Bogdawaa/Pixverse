@@ -161,20 +161,15 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     }
     
     func generate(with parameters: GenerationParameters) async  {
-        defer {
-            Task {
-                await generationManager.endGeneration()
-            }
-        }
         
-        let canStart = await generationManager.canStartGeneration()
+        let canStart = generationManager.canStartGeneration()
         guard canStart else {
-            errorMessage = "Maximum number of concurrent generations is limited to \(await generationManager.maxConcurrentGenerations). Please wait for current generations to finish."
+            errorMessage = "Maximum number of concurrent generations is limited to \( generationManager.maxConcurrentGenerations). Please wait for current generations to finish."
             showAlert = true
             return
         }
         // Increse generations
-        await generationManager.startGeneration()
+        generationManager.startGeneration()
        
         
         loadGenerations()
@@ -194,13 +189,14 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
     
     func resetData() {
         errorMessage = nil
-        selectedImage = nil
+//        selectedImage = nil
         error = nil
-        prompt = ""
-        selectedItem = nil
-        selectedMedia = nil
+//        prompt = ""
+//        selectedItem = nil
+//        selectedMedia = nil
         isLoading = false
         isGenerationComplete = false
+        generatedVideoUrl = nil
     }
     
     // MARK: - Private Methods
@@ -305,6 +301,7 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
                                     activeGenerations[index] = updated
                                 }
                             }
+                            generationManager.endGeneration()
                             return
                         }
                         
@@ -317,6 +314,7 @@ final class TextGenerationViewModel: ObservableObject, GenerationProgressViewMod
                         await MainActor.run {
                             activeGenerations.removeAll { $0.id == generation.id }
                         }
+                        generationManager.endGeneration()
                         return
                         
                     default:

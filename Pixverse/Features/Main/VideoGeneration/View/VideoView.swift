@@ -49,7 +49,7 @@ struct VideoView: View {
             ToolbarItem(placement: .principal) {
                 Text("Video generation")
                     .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.appMainText)
             }
         }
         .navigationBarTitleDisplayMode(.inline)

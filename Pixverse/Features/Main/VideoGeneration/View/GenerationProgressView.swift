@@ -10,11 +10,6 @@ import AVKit
 
 struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: View {
     
-//    enum MediaType {
-//        case image(Image)
-//        case video(URL)
-//    }
-    
     enum VideoDisplayMode {
         case preview
         case fullscreen
@@ -45,7 +40,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                     templatesFooterView
                 }
                 .onDisappear {
-                    viewModel.resetData()
+//                    viewModel.resetData()
                 }
                 .transition(.opacity)
                 .navigationDestination(isPresented: $showFullscreenPlayer) {
@@ -72,7 +67,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
             ToolbarItem(placement: .principal) {
                 Text("Video generation")
                     .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.appMainText)
             }
         }
     }
@@ -90,7 +85,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
                     .scaledToFill()
                     .frame(width: contentWidth, height: contentHeight)
                     .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 32))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             case .video(let url):
                 VideoPlayer(player: AVPlayer(url: url))
             }
@@ -100,8 +95,8 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
         .overlay {
             if viewModel.isLoading {
                 ZStack {
-                    Color.appBackground.opacity(0.3)
-                        .clipShape(RoundedRectangle(cornerRadius: 32))
+                    Color.black.opacity(0.3)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                         .padding(.vertical, 24)
                         .padding(.horizontal, 78)
                     
@@ -118,7 +113,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
     private var progressView: some View {
         VStack {
             mediaPreview
-                .clipShape(RoundedRectangle(cornerRadius: 32))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
                 .frame(maxWidth: .infinity)
             
             Text("It can take several minutes to create a video. Please don't leave the app")
@@ -142,7 +137,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
         VStack {
             if let videoURL = URL(string: viewModel.generatedVideoUrl ?? "") {
                 thumbnailView(url: videoURL)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     .padding(.horizontal, 106)
                     .padding(.vertical, 24)
             }
@@ -185,7 +180,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
             }
         }
         .background(Color.appCard)
-        .clipShape(RoundedRectangle(cornerRadius: 30))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
         .padding(16)
     }
     
@@ -200,7 +195,7 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
             }
         )
         .background(.appCard)
-        .clipShape(RoundedRectangle(cornerRadius: 30))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
         .padding(16)
     }
     
@@ -314,6 +309,6 @@ struct GenerationProgressView<ViewModel: GenerationProgressViewModelProtocol>: V
 #Preview {
     GenerationProgressView(
         viewModel: VideoGenerationViewModel(),
-        mediaType: .image(Image(.amigurumi))
+        mediaType: .image(Image(.subject3Fever))
     )
 }

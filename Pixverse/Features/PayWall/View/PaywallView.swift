@@ -34,17 +34,19 @@ struct PaywallView: View {
 
                 // Subscription options
                 subscriptionOptions
+                    .padding(.horizontal)
                 
                 // CancelAnyTime Button
                 cancelAnyTimeButton
                 
                 // Continue button
                 continueButton
+                    .padding(.horizontal)
                 
                 // Legal Buttons
                 legalLinksButtons
+                    .padding()
             }
-            .padding()
             
             if appState.isLoading {
                 ProgressView()
@@ -86,26 +88,31 @@ struct PaywallView: View {
     
     private var headerImageWithOverlay: some View {
         ZStack(alignment: .bottom) {
-            GeometryReader { geometry in
-                Image(.paywall)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .clipped()
-            }
+            Image(.paywallContents)
+                .resizable()
+                .frame(maxWidth: .infinity)
+                .clipped()
+                .overlay(alignment: .bottom) {
+                    LinearGradient(
+                        gradient: Gradient(
+                            colors: [
+                                .appBackground.opacity(0),
+                                .appBackground.opacity(0.5),
+                                .appBackground
+                            ]
+                        ),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 515)
+                }
             .overlay(alignment: .bottom) {
                 FeatureListView(features: viewModel.features)
                     .padding()
                     .frame(height: 132)
                     .frame(maxWidth: .infinity)
-                    .background(.appDarkGray)
-                    .clipShape(.rect(cornerRadius: 30))
-                    .foregroundStyle(.white)
-            }
-            .overlay(alignment: .top) {
-                ProBadgeView( action: {
-                    // PRO button onTap action?
-                })
+                    .background(.clear)
+                    .foregroundStyle(.appPrimaryText)
             }
             .overlay(alignment: .topTrailing) {
                 CloseButton(isVisible: $viewModel.showCloseButton) {
@@ -113,7 +120,6 @@ struct PaywallView: View {
                     onDismiss()
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 30))
             .frame(minWidth: 150)
         }
     }
@@ -141,7 +147,7 @@ struct PaywallView: View {
             // Cancel Anytime
         } label: {
             Label("Cancel Anytime",
-                  systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90"
+                  systemImage: ""
             )
             .font(.system(size: 12))
             .frame(minHeight: 40)
@@ -182,14 +188,14 @@ struct PaywallView: View {
                     }
                 }, label: {
                     Text("Restore Purcahses")
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.appSecondary)
                 })
                 Spacer()
                 Button("Terms of Use") {
                     viewModel.selectedURL = .terms
                 }
             }
-            .foregroundStyle(.white.opacity(0.4))
+            .foregroundStyle(.appSecondaryText2)
             .font(.caption)
         }
         .frame(maxWidth: .infinity)

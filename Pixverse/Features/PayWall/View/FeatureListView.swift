@@ -13,6 +13,13 @@ struct FeatureListView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Pixverse Video")
+                    .font(.system(size: 28, weight: .bold))
+                Text("PRO")
+                    .foregroundStyle(.appGreen)
+                    .font(.system(size: 28, weight: .bold))
+            }
             ForEach(features, id: \.title) { feature in
                 Label {
                     Text(feature.title)

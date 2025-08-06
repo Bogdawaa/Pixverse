@@ -25,6 +25,9 @@ struct GenerationItemView: View {
             } else if generation.status == .success {
                 if let videoURL = generation.videoUrl {
                     thumbnailView(url: videoURL)
+                        .task {
+                            loadThumbnail(from: videoURL)
+                        }
                 }
             } else {
                 Image(systemName: "play.slash.fill")
@@ -37,11 +40,13 @@ struct GenerationItemView: View {
         .contentShape(RoundedRectangle(cornerRadius: 20))
         .onReceive(generation.$status) { newStatus in
             if newStatus == .success, let url = generation.videoUrl {
+                print("status received. start loading")
                 loadThumbnail(from: url)
             }
         }
         .onChange(of: generation.videoUrl) { newUrl in
             if generation.status == .success, let url = newUrl {
+                print("status changed. start loading")
                 loadThumbnail(from: url)
             }
         }
@@ -50,7 +55,6 @@ struct GenerationItemView: View {
                 loadThumbnail(from: url)
             }
         }
-
     }
     
     // MARK: - Thumbnail
@@ -67,7 +71,7 @@ struct GenerationItemView: View {
                                 gradient: Gradient(
                                     colors: [
                                         .black.opacity(0),
-                                        .appBackground.opacity(0.8)
+                                        .black.opacity(0.8)
                                     ]
                                 ),
                                 startPoint: .top,

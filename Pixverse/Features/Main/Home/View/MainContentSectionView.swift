@@ -22,7 +22,7 @@ struct MainContentSectionView: View {
             HStack {
                 Text(section.type.title)
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.appMainText)
                 
                 Spacer()
                 

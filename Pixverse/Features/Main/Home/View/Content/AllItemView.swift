@@ -38,7 +38,7 @@ struct AllItemsView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text(section.type.title)
-                    .foregroundColor(.white)
+                    .foregroundColor(.appMainText)
                     .fontWeight(.bold)
             }
             

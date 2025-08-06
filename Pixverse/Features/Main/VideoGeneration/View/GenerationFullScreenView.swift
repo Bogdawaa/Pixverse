@@ -24,7 +24,7 @@ struct FullscreenVideoPlayer: View {
             VideoPlayer(player: player)
                 .disabled(true)
                 .edgesIgnoringSafeArea(.all)
-                .clipShape(RoundedRectangle(cornerRadius: 30))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
                 .padding()
                 .onAppear {
                     setupPlayer()
@@ -48,11 +48,11 @@ struct FullscreenVideoPlayer: View {
             ToolbarItem(placement: .principal) {
                 Text("Video generation")
                     .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.appMainText)
             }
         }
         .animation(.easeInOut(duration: 0.2), value: showControls)
-        .contentShape(RoundedRectangle(cornerRadius: 30))
+        .contentShape(RoundedRectangle(cornerRadius: 8))
         .onTapGesture {
             handleTap()
         }

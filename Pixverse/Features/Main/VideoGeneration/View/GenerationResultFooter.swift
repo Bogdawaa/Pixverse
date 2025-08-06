@@ -21,7 +21,7 @@ struct GenerationResultFooter: View {
             Text(title)
                 .fontWeight(.bold)
                 .font(.title2)
-                .foregroundStyle(.white)
+                .foregroundStyle(.appMainText)
                 .padding(.horizontal)
                 .padding(.top)
             
@@ -45,12 +45,12 @@ struct GenerationResultFooter: View {
             .frame(height: 121 + 16)
             .padding(.bottom)
         }
-        .toolbarBackground(Color.appBackground, for: .navigationBar)
+//        .toolbarBackground(Color.appBackground, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("Photo generation")
                     .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.appMainText)
             }
         }
         .background(.appCard)

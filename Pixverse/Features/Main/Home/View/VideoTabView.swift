@@ -20,6 +20,6 @@ struct VideoTabView: View {
                 videoGenerationVM: videoGenerationVM,
                 textGenerationVM: textGenerationVM
             )
-            .toolbarColorScheme(.dark, for: .navigationBar)
+//            .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }

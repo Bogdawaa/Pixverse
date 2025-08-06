@@ -12,15 +12,13 @@ struct SettingsButton: View {
     
     var body: some View {
         Button {
-            router.shouldShowSettings = true
+//            router.shouldShowSettings = true
+            router.navigate(to: .settings)
         } label: {
             Image(.setting)
-                .tint(.white)
-                .background {
-                    Circle()
-                        .fill(Color.appCard)
-                        .frame(width: 32, height: 32)
-                }
+                .tint(.appGreen)
+                .frame(width: 24, height: 24)
         }
+        .frame(width: 32, height: 32)
     }
 }

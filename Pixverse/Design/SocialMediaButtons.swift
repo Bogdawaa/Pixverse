@@ -17,15 +17,16 @@ struct SocialMediaButton: View {
         }) {
             VStack(spacing: 4) {
                 icon
+                    .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 24, height: 24)
+                    .foregroundStyle(.appMainText)
                 
                 Text(label)
                     .font(.system(size: 11, weight: .regular))
                     .foregroundStyle(.appSecondaryText2)
             }
-            .foregroundColor(.white)
             .frame(width: 60)
         }
     }

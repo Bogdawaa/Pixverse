@@ -88,24 +88,17 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
     }
     
     func generate(with parameters: GenerationParameters) async {
-        defer {
-            Task {
-                await generationManager.endGeneration()
-            }
-        }
-                
-        let canStart = await generationManager.canStartGeneration()
+        let canStart = generationManager.canStartGeneration()
         guard canStart else {
-            errorMessage = "Maximum number of concurrent generations is limited to \(await generationManager.maxConcurrentGenerations). Please wait for current generations to finish."
+            errorMessage = "Maximum number of concurrent generations is limited to \(generationManager.maxConcurrentGenerations). Please wait for current generations to finish."
             showAlert = true
             return
         }
         // Increse generations
-        await generationManager.startGeneration()
+        generationManager.startGeneration()
         
         loadGenerations()
 
-        
         if let image = parameters.image {
             await generateTemplateToVideo(templateId: parameters.templateId, image: image)
         } else if let videoUrl = parameters.videoUrl {
@@ -225,6 +218,7 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
     }
     
     private func checkStatusUntilCompleted(for generation: VideoGeneration) {
+            
         Task {
             while true {
                 do {
@@ -252,6 +246,7 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
                             await MainActor.run {
                                 if let index = activeGenerations.firstIndex(where: { $0.id == generation.id }) {
                                     activeGenerations[index] = updated
+                                    generationManager.endGeneration()
                                 }
                             }
                             return
@@ -265,6 +260,7 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
                         try storage.deleteGeneration(id: generation.id)
                         await MainActor.run {
                             activeGenerations.removeAll { $0.id == generation.id }
+                            generationManager.endGeneration()
                         }
                         return
                         
@@ -276,6 +272,7 @@ final class VideoGenerationViewModel: ObservableObject, GenerationProgressViewMo
                     errorMessage = "Generation failed. Please try again."
                     self.error = error
                     isLoading = false
+                    generationManager.endGeneration()
                     break
                 }
             }

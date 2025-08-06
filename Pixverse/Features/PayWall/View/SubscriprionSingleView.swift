@@ -21,29 +21,29 @@ struct SubscriptionSingleView: View {
             boldParts: [price],
             boldFont: .body.bold(),
             regularFont: .body,
-            color: .white
+            color: .appMainText
         )
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            Capsule()
+            RoundedRectangle(cornerRadius: 8)
                 .stroke(isSelected ? Color.appGreen : Color.gray.opacity(0.3), lineWidth: isSelected ? 2 : 1)
         )
-        .contentShape(Capsule())
+        .contentShape(RoundedRectangle(cornerRadius: 8))
         .overlay(alignment: .topTrailing) {
             // MARK: - Sale badge
             if hasDiscount {
                 Text("SAVE \(80)%")
                     .font(.caption2.bold())
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, 17)
+                    .padding(.vertical, 5)
                     .background(Color.appGreen)
-                    .foregroundColor(.black)
+                    .foregroundColor(.appBackground)
                     .clipShape(
                         UnevenRoundedRectangle(
                             bottomLeadingRadius: 20,
-                            topTrailingRadius: 20
+                            topTrailingRadius: 8
                         )
                     )
                     .zIndex(1)

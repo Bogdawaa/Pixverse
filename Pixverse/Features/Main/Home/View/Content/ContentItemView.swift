@@ -32,12 +32,12 @@ struct ContentItemView: View {
             } else {
                 Image(systemName: "play.slash.fill")
                     .font(.system(size: 24))
-                    .foregroundColor(.white)
+                    .foregroundColor(.appMainText)
             }
         }
         .frame(width: 175, height: 225)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .contentShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .contentShape(RoundedRectangle(cornerRadius: 8))
         .onTapGesture {
             router.showVideoDetail(item: item)
         }
@@ -61,7 +61,7 @@ struct ContentItemView: View {
                             gradient: Gradient(
                                 colors: [
                                     .black.opacity(0),
-                                    .appBackground.opacity(0.8)
+                                    .black.opacity(0.8)
                                 ]
                             ),
                             startPoint: .top,
@@ -76,7 +76,7 @@ struct ContentItemView: View {
                 Color.gray.opacity(0.3)
                     .overlay(
                         Image(systemName: "photo")
-                            .foregroundColor(.white)
+                            .foregroundColor(.appMainText)
                     )
             }
         }

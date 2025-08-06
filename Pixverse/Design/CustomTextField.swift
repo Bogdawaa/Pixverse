@@ -15,7 +15,7 @@ struct CustomTextField: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             TextEditor(text: $text)
-                .foregroundColor(.appSecondaryText2)
+                .foregroundColor(.appMainText)
                 .scrollContentBackground(.hidden)
                 .background(Color.appCard2)
                 .frame(height: height)

@@ -102,26 +102,26 @@ struct OnboardingView: View {
     // MARK: - OnboardingItem Data
     private let pages: [OnboardingItem] = [
         OnboardingItem(
-            imageName: "subject3fever",
-            title: "Generate magic with AI",
-            description: "Generate unique photos and videos in amy style - no skills needed, just imagination."
+            imageName: "iphone with notifications",
+            title: "Create videos in seconds",
+            description: "Just type your idea - AI makes the video for you. Fast, simple, no editing needed"
         ),
         OnboardingItem(
-            imageName: "onb2",
-            title: "It's that simple",
-            description: "No complex tools or editing skills needed - just one prompt and you're ready to go."
+            imageName: "iPhone - Realism",
+            title: "Videos by prompt and style",
+            description: "Pick a style, describe the scene - we'll handle the rest automatically and creatively."
         ),
         OnboardingItem(
-            imageName: "onb3",
-            title: "Create unique photos",
-            description: "Bring your imagination to life in any style. Just describe what you want, and get a unique image."
+            imageName: "iphone with notifications-2",
+            title: "Generate photos",
+            description: "Create vivid portraits and styles with AI - quick, precise, and truly unique."
         )
     ]
     
     private let notificationsRequestPage = OnboardingItem(
-        imageName: "onb4",
-        title: "Always be aware!",
-        description: "Allow notification to stay informed and never miss the latest updates."
+        imageName: "iphone with notifications-3",
+        title: "Enable notifications",
+        description: "Get alerts when your video is ready or a new template drops - never miss updates."
     )
 }
 

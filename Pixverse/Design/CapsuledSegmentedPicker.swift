@@ -29,15 +29,16 @@ struct CapsuleSegmentedPicker<T: Hashable & CaseIterable>: View where T.AllCases
                     }) {
                         Text(titleMapping(option))
                             .font(.system(size: 13, weight: .regular))
-                            .foregroundColor(.white)
+                            .tracking(-0.08)
+                            .foregroundColor(selection == option ? .white : .black)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 8)
                             .background(
-                                Capsule()
-                                    .fill(.appCard)
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(selection == option ? .appGreen : .appCard)
                                     .overlay(
-                                        Capsule()
-                                            .stroke(selection == option ? .appGreen : Color.clear, lineWidth: 1)
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(selection == option ? .clear : .white.opacity(0.05), lineWidth: 1)
                                     )
                             )
                     }

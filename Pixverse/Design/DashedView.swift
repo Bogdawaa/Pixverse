@@ -8,18 +8,18 @@
 import SwiftUI
 
 struct DashedView<Content: View>: View {
-    var cornerRadius: CGFloat = 24
+    var cornerRadius: CGFloat = 8
     var dashLength: CGFloat = 2
     var dashGap: CGFloat = 2
     var lineWidth: CGFloat = 1
-    var color: Color = .gray
+    var color: Color = .appGreen
     let content: Content
     
     init(cornerRadius: CGFloat = 8,
-         dashLength: CGFloat = 4,
-         dashGap: CGFloat = 4,
+         dashLength: CGFloat = 2,
+         dashGap: CGFloat = 2,
          lineWidth: CGFloat = 1,
-         color: Color = .gray,
+         color: Color = .appGreen,
          @ViewBuilder content: () -> Content) {
         self.cornerRadius = cornerRadius
         self.dashLength = dashLength

@@ -29,7 +29,7 @@ struct TextGenerationView: View {
                 CustomTextField(placeholder: "Enter your prompt", text: $viewModel.prompt)
                     .frame(minHeight: 130)
                     .background(.appCard2)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     .toolbar {
                         ToolbarItemGroup(placement: .keyboard) {
                             Spacer()
@@ -69,17 +69,19 @@ struct TextGenerationView: View {
                 
                 // MARK: - Dashed view to upload photo/video
                 if viewModel.shouldShowUploadButton {
-                    DashedView(cornerRadius: 24) {
+                    DashedView(cornerRadius: 8) {
                         Button(action: {
                             viewModel.checkPhotoLibraryPermission()
                         }) {
                             VStack {
                                 Image(.upload)
+                                    .renderingMode(.template)
+                                    .tint(.appGreen)
                                 Text(viewModel.isUploadPhotoEnabled ? "Upload photo" : "Upload a video")
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 168)
-                            .foregroundColor(.appSecondaryText2)
+                            .foregroundStyle(.appGreen)
                             .font(.headline)
                             .overlay {
                                 if let media = viewModel.selectedMedia {
@@ -101,8 +103,8 @@ struct TextGenerationView: View {
                                     }
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 168)
-                                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                                    .contentShape(RoundedRectangle(cornerRadius: 24))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .contentShape(RoundedRectangle(cornerRadius: 8))
                                 }
                             }
                         }
@@ -115,9 +117,9 @@ struct TextGenerationView: View {
                 }
             }
             .padding()
-            .foregroundStyle(.white)
+            .foregroundStyle(.appMainText)
             .background(.appCard)
-            .clipShape(RoundedRectangle(cornerRadius: 30))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
             .gesture(
                 DragGesture().onEnded { gesture in
                     if gesture.translation.height > 50 && gesture.predictedEndTranslation.height > 100 {
@@ -149,6 +151,7 @@ struct TextGenerationView: View {
                     
                     Task {
                         if appState.isPremium {
+                            viewModel.resetData()
                             print("before \(viewModel.activeGenerations)")
                             await viewModel.generate(with: params)
                             print("after \(viewModel.activeGenerations)")

@@ -73,9 +73,9 @@
   },
   "simulatedTransactions" : [
     {
+      "originalPurchaseDate" : "2025-08-03T00:00:00Z",
       "productIdentifier" : "year_39.99_nottrial",
-      "transactionState" : "Purchased",
-      "originalPurchaseDate": "2025-08-03T00:00:00Z"
+      "transactionState" : "Purchased"
     }
   ],
   "subscriptionGroups" : [

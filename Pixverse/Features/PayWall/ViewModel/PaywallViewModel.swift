@@ -32,9 +32,9 @@ final class PaywallViewModel: ObservableObject {
     }
     
     let features = [
-        Feature(title: "Exclusive styles and templates", icon: "sparkles"),
-        Feature(title: "Unlimited generations", icon: "sparkles"),
-        Feature(title: "Lack of advertising", icon: "sparkles")
+        Feature(title: "Exclusive styles and templates", icon: ""),
+        Feature(title: "Unlimited generations", icon: ""),
+        Feature(title: "Lack of advertising", icon: "")
     ]
     
     var subscriptionOptions: [ApphudProduct] {

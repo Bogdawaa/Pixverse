@@ -7,31 +7,37 @@
 
 import Foundation
 
-
-actor GenerationManager {
+@MainActor
+final class GenerationManager: ObservableObject {
     static let shared = GenerationManager()
     
-    private(set) var maxConcurrentGenerations = 2
-    private var activeGenerations = 0
+    @Published private(set) var maxConcurrentGenerations = 2
+    @Published private(set) var currentActiveGenerations = 0
     
     private init() {}
     
     func canStartGeneration() -> Bool {
-        activeGenerations < maxConcurrentGenerations
+        currentActiveGenerations < maxConcurrentGenerations
     }
     
     func startGeneration() {
-        activeGenerations += 1
+        currentActiveGenerations += 1
+        debugStatus()
     }
     
     func endGeneration() {
-        activeGenerations -= 1
-        if activeGenerations < 0 {
-            activeGenerations = 0
+        currentActiveGenerations -= 1
+        if currentActiveGenerations < 0 {
+            currentActiveGenerations = 0
         }
+        debugStatus()
     }
     
-    var currentActiveGenerations: Int {
-        activeGenerations
+    func debugStatus() {
+        print("""
+        Active generations: \(currentActiveGenerations)
+        Max allowed: \(maxConcurrentGenerations)
+        Available: \(maxConcurrentGenerations - currentActiveGenerations) / \(maxConcurrentGenerations)
+        """)
     }
 }

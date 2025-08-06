@@ -28,7 +28,7 @@ struct CapsuleTabBar: View {
                             .foregroundColor(selectedTab == index ? .appGreen : .gray)
                         Text(tabs[index].title)
                             .font(.system(size: 10))
-                            .foregroundColor(selectedTab == index ? .white : .gray)
+                            .foregroundColor(selectedTab == index ? .appMainText : .gray)
                     }
                     .padding(6)
                     .frame(maxWidth: .infinity)
@@ -36,9 +36,8 @@ struct CapsuleTabBar: View {
                     .background(
                         Group {
                             if selectedTab == index {
-                                Capsule()
-                                    .fill(Color.appCard2)
-                                    .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.white)
                             }
                         }
                     )
@@ -47,9 +46,8 @@ struct CapsuleTabBar: View {
             }
         }
         .background(
-            Capsule()
+            RoundedRectangle(cornerRadius: 8)
                 .fill(Color.appCard)
-                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 2)
         )
         .padding(.horizontal, 20)
     }

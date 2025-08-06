@@ -74,6 +74,8 @@ struct MainViewWrapper: View {
                             )
                         case .allItems(let section):
                             AllItemsView(section: section)
+                        case .settings:
+                            SettingsView()
                         default:
                             EmptyView()
                         }
@@ -97,9 +99,6 @@ struct MainViewWrapper: View {
                 }
             }
             .tint(.appSecondaryText2)
-            .fullScreenCover(isPresented: $router.shouldShowSettings, content: {
-                SettingsViewWithToolbar()
-            })
             .fullScreenCover(isPresented: $router.shouldShowPaywall, content: {
                 PaywallView(onDismiss: {
                     router.shouldShowPaywall = false
@@ -111,7 +110,7 @@ struct MainViewWrapper: View {
                     .transition(.move(edge: .bottom))
             }
         }
-        .toolbarColorScheme(.dark, for: .navigationBar)
+//        .toolbarColorScheme(.dark, for: .navigationBar)
         .tint(.appSecondaryText2)
         
         .onChange(of: router.selectedTab) { newTab in

@@ -19,50 +19,43 @@ struct SingleOnboardingView: View {
 
             VStack {
                 // Image + Gradient
-                Image(page.imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .clipped()
-                    .overlay(
-                        LinearGradient(
-                            gradient: Gradient(
-                                colors: [
-                                    .black.opacity(0),
-                                    .appBackground
-                                ]
-                            ),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                ZStack {
+                    Image("onboardingImage")
+//                        .resizable()
+                    Image(page.imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .padding(.horizontal, 53)
+                        .padding(.top, 53)
+                        .clipped()
+                }
+                .overlay( alignment: .bottom) {
+                    LinearGradient(
+                        gradient: Gradient(
+                            colors: [
+                                .white.opacity(0),
+                                .appBackground
+                            ]
+                        ),
+                        startPoint: .top,
+                        endPoint: .bottom
                     )
+                    .frame(height: 130)
+                }
                 
                 // Content and Bottom Navigation
                 VStack(spacing: 0) {
-                        HStack(spacing: 8) {
-                            ForEach(0..<pageCount, id: \.self) { index in
-                                Circle()
-                                    .frame(width: 8, height: 8)
-                                    .foregroundColor(currentPage == index ? .appGreen : .white.opacity(30))
-                                    .opacity(currentPage == index ? 1 : 0.5)
-                            }
-                        }
-                        .padding()
-                        .background(Color.appCard.clipShape(Capsule()))
-                        .padding(.top, 50)
-                        .padding(.bottom, 30)
-                        .opacity(showPageIndicators ? 1 : 0)
-                    
                     // Text content
                     VStack(alignment: .leading, spacing: 12) {
                         Text(page.title)
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(.appMainText)
                         
                         Text(page.description)
                             .font(.body)
                             .multilineTextAlignment(.leading)
-                            .foregroundColor(.white.opacity(0.9))
+                            .foregroundColor(.appPrimaryText.opacity(0.94))
                             .padding(.bottom, 30)
                     }
                     .padding(.horizontal)
@@ -79,7 +72,6 @@ struct SingleOnboardingView: View {
                     }) {
                         Text("Next")
                             .font(.headline)
-                            .foregroundColor(.black)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
                             .padding(.horizontal, 20)
@@ -89,6 +81,7 @@ struct SingleOnboardingView: View {
                 }
             }
             .background(Color.appBackground)
+            .padding(.bottom, 16)
         }
 }
 
@@ -96,7 +89,7 @@ struct SingleOnboardingView: View {
 #Preview {
     SingleOnboardingView(
         page: OnboardingItem(
-            imageName: "onb4",
+            imageName: "iphone with notifications",
             title: "Always be aware!",
             description: "Allow notification to stay informed and never miss the latest updates."
         ),

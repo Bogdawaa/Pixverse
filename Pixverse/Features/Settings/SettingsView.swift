@@ -13,107 +13,134 @@ struct SettingsView: View {
     @EnvironmentObject var appState: AppState
     @StateObject private var viewModel = SettingsViewModel()
     
+    @ObservedObject private var generationManager = GenerationManager.shared
+    
     @State private var showMailUnavailableAlert = false
     @State private var isShowPaywall = false
     
     var body: some View {
         VStack {
-            List {
-                // MARK: - Purchase Section
-                Section(
-                    header: Text("Purchases & actions")
+            VStack(alignment: .leading) {
+                Text("Purchases & Actions")
                     .font(.headline)
                     .foregroundStyle(.appSecondaryText2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                // Row 1
+                HStack {
+                    Text("Number of avalibable generations")
+                    Spacer()
+                    Text(
+                        "\(generationManager.maxConcurrentGenerations - generationManager.currentActiveGenerations)/\(generationManager.maxConcurrentGenerations)"
+                    )
+                    .foregroundStyle(.appSecondaryText2)
                     
-                
-                ) {
-                    // Row 1
-                    Button {
-                        isShowPaywall = true
-                    } label: {
-                        Text("Subscription management")
-                            .padding(.leading, 16)
-                    }
-
-                    
-                    // Row 2 (with toggle)
-                    HStack {
-                        Text("Notifications")
-                            .padding(.leading, 16)
-                        Spacer()
-                        Toggle("", isOn: Binding(
-                            get: { viewModel.isNotificationToggleOn },
-                            set: { newValue in
-                                viewModel.toggleNotifications(newValue: newValue)
-                            }))
-                            .labelsHidden()
-                            .tint(.appGreen)
-                    }
-                    #if DEBUG
-                    HStack {
-                        // переключатель для тестирования
-                        Text("Is Premium User")
-                            .padding(.leading, 16)
-                        Spacer()
-                        Toggle("", isOn: $appState.isPremium)
-                            .labelsHidden()
-                            .tint(.appGreen)
-                    }
-                    #endif
                 }
-                .listRowBackground(Color.appBackground)
+                .padding(.horizontal, 16)
+                .frame(height: 44)
                 
-                // MARK: - Info Section
-                Section(
-                    header: Text("Info & legal")
-                        .font(.headline)
-                        .font(.headline)
-                        .foregroundStyle(.appSecondaryText2)
-                ) {
-                    // Row 1
-                    Button {
-                        if let emailURL = viewModel.getEmailURL() {
-                            if UIApplication.shared.canOpenURL(URL(string: "mailto:")!) {
-                                UIApplication.shared.open(emailURL, options: [:], completionHandler: nil)
-                            } else {
-                                showMailUnavailableAlert = true
-                            }
+                Button {
+                    if AppState.shared.isPremium {
+                        Task {
+                            await viewModel.openSubscriptionManagement()
                         }
-                    } label: {
-                        Text("Contact us")
-                            .padding(.leading, 16)
-                            .foregroundColor(.white)
+                    } else {
+                        isShowPaywall = true
                     }
-                    // Row 2
-                    Button {
-                        viewModel.selectedURL = .privacy
-                    } label: {
-                        Text("Privacy Policy")
-                            .padding(.leading, 16)
+                } label: {
+                    HStack {
+                        Text("Subscription management")
+                        Spacer()
+                        Image(systemName: "chevron.right")
                     }
-
-                    
-                    // Row 3
-                    Button {
-                        viewModel.selectedURL = .terms
-                    } label: {
-                        Text("Usage Policy")
-                            .padding(.leading, 16)
-                    }
+                    .padding(.horizontal, 16)
+                    .frame(height: 44)
                 }
-                .listRowBackground(Color.appBackground)
+                
+                
+                // Row 2 (with toggle)
+                HStack {
+                    Text("Notifications")
+                    Spacer()
+                    Toggle("", isOn: Binding(
+                        get: { viewModel.isNotificationToggleOn },
+                        set: { newValue in
+                            viewModel.toggleNotifications(newValue: newValue)
+                        }))
+                    .labelsHidden()
+                    .tint(.appGreen)
+                }
+                .frame(height: 44)
+                .padding(.horizontal)
+                
+                #if DEBUG
+                HStack {
+                    // переключатель для тестирования
+                    Text("Is Premium User")
+                    Spacer()
+                    Toggle("", isOn: $appState.isPremium)
+                        .labelsHidden()
+                        .tint(.appGreen)
+                }
+                .frame(height: 44)
+                .padding(.horizontal)
+                #endif
+                
+                Text("Info & legal")
+                    .font(.headline)
+                    .foregroundStyle(.appSecondaryText2)
+                    .frame(height: 44)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                // Row 1
+                Button {
+                    if let emailURL = viewModel.getEmailURL() {
+                        if UIApplication.shared.canOpenURL(URL(string: "mailto:")!) {
+                            UIApplication.shared.open(emailURL, options: [:], completionHandler: nil)
+                        } else {
+                            showMailUnavailableAlert = true
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text("Contact us")
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                    }
+                    .frame(height: 44)
+                    .padding(.horizontal, 16)
+                    .foregroundColor(.appMainText)
+                }
+                // Row 2
+                Button {
+                    viewModel.selectedURL = .privacy
+                } label: {
+                    HStack {
+                        Text("Privacy Policy")
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                    }
+                    .frame(height: 44)
+                    .padding(.horizontal, 16)
+                }
+                
+                
+                // Row 3
+                Button {
+                    viewModel.selectedURL = .terms
+                } label: {
+                    HStack {
+                        Text("Usage Policy")
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                    }
+                    .frame(height: 44)
+                    .padding(.horizontal, 16)
+                }
             }
-            .scrollDisabled(true)
-            .navigationTitle("Subscribers")
-            .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
-            .foregroundStyle(.white)
-            .frame(maxHeight: 370)
-            
-            
+            .padding()
+            .foregroundStyle(.appMainText)
             
             Text("App Version: \(viewModel.appVersion)")
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.appSecondaryText2)
                 .font(.system(size: 13))
             
             Spacer()
@@ -171,7 +198,7 @@ struct SettingsViewWithToolbar: View {
                     ToolbarItem(placement: .principal) {
                         Text("Subscribers")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(.appMainText)
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)

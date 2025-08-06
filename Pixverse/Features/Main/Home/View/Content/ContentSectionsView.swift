@@ -35,7 +35,7 @@ struct ContentSectionsView: View {
             if viewModel.isLoading && viewModel.sections.isEmpty {
                 ProgressView()
                     .scaleEffect(1.5)
-                    .tint(.white)
+                    .tint(.appMainText)
             }
             
             // if empty

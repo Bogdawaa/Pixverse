@@ -9,6 +9,7 @@ import SwiftUI
 import MessageUI
 import NotificationCenter
 import ApphudSDK
+import StoreKit
 
 final class SettingsViewModel: ObservableObject {
     
@@ -97,6 +98,16 @@ final class SettingsViewModel: ObservableObject {
         let mailtoURLString = "mailto:\(recipient)?subject=\(encodedSubject)&body=\(encodedBody)"
         
         return URL(string: mailtoURLString)
+    }
+    
+    func openSubscriptionManagement() async {
+        do {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                try await AppStore.showManageSubscriptions(in: windowScene)
+            }
+        } catch {
+            print("Ошибка при открытии управления подписками: \(error.localizedDescription)")
+        }
     }
     
     private func loadAppVersion() {

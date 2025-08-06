@@ -17,7 +17,7 @@ struct SubscriptionButton: View {
         } label: {
             Image(systemName: "sparkles")
                 .symbolRenderingMode(.monochrome)
-                .foregroundColor(.appBackground)
+                .foregroundColor(.appGreen)
                 .padding(4)
                 .background {
                     Circle()

@@ -43,18 +43,18 @@ struct LibraryView: View {
     private var emptyContentView: some View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
-                RoundedRectangle(cornerRadius: 30)
+                RoundedRectangle(cornerRadius: 8)
                     .fill(.appCard)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 30)
+                        RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.white.opacity(0.05), lineWidth: 1)
                     )
                     .frame(height: 225)
                 
-                RoundedRectangle(cornerRadius: 30)
+                RoundedRectangle(cornerRadius: 8)
                     .fill(.appCard)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 30)
+                        RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.white.opacity(0.05), lineWidth: 1)
                     )
                     .frame(height: 225)
@@ -63,16 +63,20 @@ struct LibraryView: View {
             Text("Start your first creation!")
                 .font(.system(size: 28))
                 .fontWeight(.bold)
-                .foregroundStyle(.white)
+                .tracking(0.4)
+                .foregroundStyle(.appMainText)
             
             Text("Choose what would you'd like to create first - a photo or a video. Your library will soon be full of inspiration")
-                .foregroundStyle(.appText)
+                .foregroundStyle(.appPrimaryText)
+                .font(.system(size: 17))
+                .tracking(-0.43)
+                .fontWeight(.regular)
                 .multilineTextAlignment(.center)
             
             Button {
                 router.navigateToVideoTab()
             } label: {
-                Text("Video")
+                Text("Generate")
                     .frame(maxWidth: .infinity)
                     .frame(maxHeight: 50)
             }
@@ -106,6 +110,9 @@ struct LibraryView: View {
                                 .frame(height: 225)
                                 .onTapGesture {
                                     viewModel.selectedGeneration = item
+                                }
+                                .onDisappear {
+                                    viewModel.selectedGeneration = nil
                                 }
                         }
                     }

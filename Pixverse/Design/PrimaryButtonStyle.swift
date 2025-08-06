@@ -13,9 +13,9 @@ struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
-            .foregroundStyle(isEnabled ? .appBackground : .appSecondary)
+            .foregroundStyle(isEnabled ? .appBackground : .appSecondaryText2)
             .background(isEnabled ? .appGreen: .appCard2)
-            .clipShape(Capsule(style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
             .scaleEffect(configuration.isPressed ? 0.9 : 1)
             .animation(.smooth, value: configuration.isPressed)
     }

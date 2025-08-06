@@ -19,7 +19,7 @@ struct HomeTabView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Text("Pixverse Videos")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.appMainText)
                         .fontWeight(.bold)
                         .font(.system(size: 34))
                 }

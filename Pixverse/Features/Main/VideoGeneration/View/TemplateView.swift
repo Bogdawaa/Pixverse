@@ -56,11 +56,12 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
         if let url = item.previewLargeURL {
             VStack(spacing: 24) {
                 videoPlayerView(url: url)
-                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                 
                 // Generate button
                 Button(action: {
                     if appState.isPremium {
+                        viewModel.resetData()
                         checkPhotoLibraryPermission()
                     } else {
                         isShowPaywall = true
@@ -127,7 +128,7 @@ struct TemplateView<ViewModel: GenerationProgressViewModelProtocol>: View {
                 ToolbarItem(placement: .principal) {
                     Text("Templates")
                         .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(.appMainText)
                 }
                 
                 if !appState.isPremium {
