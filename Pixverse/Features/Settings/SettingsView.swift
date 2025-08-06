@@ -61,7 +61,7 @@ struct SettingsView: View {
                 HStack {
                     Text("Notifications")
                     Spacer()
-                    Toggle("", isOn: Binding(
+                    CustomToggle(isOn: Binding(
                         get: { viewModel.isNotificationToggleOn },
                         set: { newValue in
                             viewModel.toggleNotifications(newValue: newValue)
@@ -77,7 +77,7 @@ struct SettingsView: View {
                     // переключатель для тестирования
                     Text("Is Premium User")
                     Spacer()
-                    Toggle("", isOn: $appState.isPremium)
+                    CustomToggle(isOn: $appState.isPremium)
                         .labelsHidden()
                         .tint(.appGreen)
                 }
